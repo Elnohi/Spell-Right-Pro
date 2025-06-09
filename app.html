@@ -10,6 +10,10 @@
       padding: 20px;
       background-color: #f0f4f8;
     }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
     .word-box {
       margin-bottom: 20px;
       padding: 15px;
@@ -42,6 +46,7 @@
 </head>
 <body>
   <h1>🔤 Spell Right Pro</h1>
+
   <label for="accentSelect">Choose Accent:</label>
   <select id="accentSelect" onchange="changeAccent()">
     <option value="en-GB">British</option>
@@ -53,9 +58,6 @@
   <div id="trainer"></div>
 
   <script>
-    let currentAccent = 'en-GB';
-    const trainerDiv = document.getElementById("trainer");
-
     const wordList = [
       "Nausea", "Vitamin B12", "Angina", "Chills", "Shivering",
       "Bloating", "Groin", "Confidence", "Antisocial", "Cloudy",
@@ -63,6 +65,8 @@
       "Swallowing", "Indigestion", "Spotting", "Painkillers", "Lethargic",
       "Cold compress", "Ribcage", "Drained", "Itching", "Above normal"
     ];
+
+    let currentAccent = 'en-GB';
 
     function changeAccent() {
       currentAccent = document.getElementById("accentSelect").value;
@@ -90,6 +94,9 @@
       const box = document.createElement("div");
       box.className = "word-box";
 
+      const title = document.createElement("div");
+      title.innerHTML = `<strong>Word ${index + 1}</strong>`;
+
       const speakBtn = document.createElement("button");
       speakBtn.textContent = "🔊 Speak";
       speakBtn.onclick = () => speak(word);
@@ -116,8 +123,7 @@
 
       revealBtn.onclick = () => hiddenWord.style.display = "inline";
 
-      box.appendChild(document.createTextNode(`Word ${index + 1}`));
-      box.appendChild(document.createElement("br"));
+      box.appendChild(title);
       box.appendChild(speakBtn);
       box.appendChild(input);
       box.appendChild(checkBtn);
@@ -126,15 +132,17 @@
       box.appendChild(revealBtn);
       box.appendChild(hiddenWord);
 
-      trainerDiv.appendChild(box);
+      document.getElementById("trainer").appendChild(box);
     }
 
-    function init() {
-      trainerDiv.innerHTML = "";
+    function initTrainer() {
+      document.getElementById("trainer").innerHTML = "";
       wordList.forEach((word, index) => createWordBox(word, index));
     }
 
-    init();
+    // Initial load
+    initTrainer();
   </script>
 </body>
 </html>
+
