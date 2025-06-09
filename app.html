@@ -10,10 +10,6 @@
       padding: 20px;
       background-color: #f0f4f8;
     }
-    h1 {
-      font-size: 2em;
-      margin-bottom: 10px;
-    }
     .word-box {
       margin-bottom: 20px;
       padding: 15px;
@@ -22,38 +18,36 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     button {
-      margin-right: 10px;
-      padding: 6px 12px;
-      font-size: 14px;
+      margin: 5px 5px 5px 0;
     }
     input[type="text"] {
-      padding: 6px;
+      padding: 5px;
       width: 250px;
-      font-size: 16px;
-    }
-    .hidden-word {
-      font-family: monospace;
-      letter-spacing: 2px;
     }
     .status {
       font-weight: bold;
       margin-left: 10px;
     }
+    .hidden-word {
+      font-family: monospace;
+      letter-spacing: 1px;
+      display: none;
+    }
+    #uploadSection, #saveControls, #loginSection, #accentSection {
+      margin-top: 30px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
     textarea {
       width: 100%;
       margin-top: 10px;
     }
-    #uploadSection, #saveSection, #accentSelect, #loginSection {
-      margin-top: 30px;
-      background: #fff;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
   </style>
 </head>
 <body>
-  <h1>🔤 Spell Right Pro</h1>
+  <h1>Spell Right Pro</h1>
 
   <div id="loginSection">
     <label>Email: <input type="email" id="userEmail" /></label>
@@ -61,46 +55,46 @@
     <span id="loginStatus"></span>
   </div>
 
-  <div id="accentSelect">
-    <label>Choose Accent:</label>
-    <select onchange="changeAccent(this)">
-      <option value="en-GB">British</option>
-      <option value="en-US">American</option>
-      <option value="en-CA">Canadian</option>
-      <option value="en-AU">Australian</option>
-    </select>
+  <div id="accentSection">
+    <label>Accent:
+      <select id="accentSelect" onchange="changeAccent()">
+        <option value="en-GB">British</option>
+        <option value="en-US">American</option>
+        <option value="en-CA">Canadian</option>
+        <option value="en-AU">Australian</option>
+      </select>
+    </label>
   </div>
 
   <div id="trainer"></div>
 
   <div id="uploadSection">
-    <h2>Add Your Own Words</h2>
-    <textarea id="wordInput" rows="4" placeholder="Enter words, one per line..."></textarea><br>
-    <button onclick="addWords()">➕ Add Words</button>
-    <input type="file" accept=".txt" onchange="handleFileUpload(event)" />
+    <h3>Add Words</h3>
+    <textarea id="wordInput" rows="4" placeholder="One word per line..."></textarea><br>
+    <button onclick="addCustomWords()">➕ Add Words</button>
+    <input type="file" id="fileUpload" accept=".txt" onchange="handleFileUpload(event)" />
   </div>
 
-  <div id="saveSection">
-    <button onclick="saveWords()">💾 Save</button>
-    <button onclick="loadWords()">📂 Load</button>
-    <button onclick="clearWords()">🗑 Clear</button>
+  <div id="saveControls">
+    <button onclick="saveWordList()">💾 Save List</button>
+    <button onclick="loadWordList()">📂 Load List</button>
+    <button onclick="clearWordList()">🗑 Clear</button>
   </div>
 
   <script>
-    let wordList = [];
-    let currentAccent = "en-GB";
+    let words = [];
     let userEmail = "";
+    let currentAccent = 'en-GB';
+
+    const trainerDiv = document.getElementById("trainer");
 
     function loginUser() {
       userEmail = document.getElementById("userEmail").value.trim();
-      if (userEmail) {
-        document.getElementById("loginStatus").textContent = "Logged in as " + userEmail;
-        loadWords();
-      }
+      document.getElementById("loginStatus").textContent = userEmail ? `Logged in as ${userEmail}` : '';
     }
 
-    function changeAccent(select) {
-      currentAccent = select.value;
+    function changeAccent() {
+      currentAccent = document.getElementById("accentSelect").value;
     }
 
     function speak(text) {
@@ -111,7 +105,7 @@
 
     function checkSpelling(input, correct, status) {
       const typed = input.value.trim().toLowerCase();
-      const expected = correct.trim().toLowerCase();
+      const expected = correct.toLowerCase();
       if (typed === expected) {
         status.textContent = "✅ Correct";
         status.style.color = "green";
@@ -121,7 +115,7 @@
       }
     }
 
-    function createWordBox(word, index) {
+    function createBox(word, index) {
       const box = document.createElement("div");
       box.className = "word-box";
 
@@ -147,12 +141,11 @@
       const revealBtn = document.createElement("button");
       revealBtn.textContent = "👁 Show";
 
-      const hiddenWord = document.createElement("span");
-      hiddenWord.textContent = " " + word;
-      hiddenWord.className = "hidden-word";
-      hiddenWord.style.display = "none";
+      const hidden = document.createElement("span");
+      hidden.textContent = " " + word;
+      hidden.className = "hidden-word";
 
-      revealBtn.onclick = () => hiddenWord.style.display = "inline";
+      revealBtn.onclick = () => hidden.style.display = "inline";
 
       box.appendChild(title);
       box.appendChild(speakBtn);
@@ -161,22 +154,21 @@
       box.appendChild(status);
       box.appendChild(document.createElement("br"));
       box.appendChild(revealBtn);
-      box.appendChild(hiddenWord);
+      box.appendChild(hidden);
 
-      document.getElementById("trainer").appendChild(box);
+      trainerDiv.appendChild(box);
     }
 
     function renderWords() {
-      const trainer = document.getElementById("trainer");
-      trainer.innerHTML = "";
-      wordList.forEach((word, index) => createWordBox(word, index));
+      trainerDiv.innerHTML = "";
+      words.forEach((word, index) => createBox(word, index));
     }
 
-    function addWords() {
-      const text = document.getElementById("wordInput").value.trim();
-      if (!text) return;
-      const newWords = text.split(/\n+/).map(w => w.trim()).filter(Boolean);
-      wordList.push(...newWords);
+    function addCustomWords() {
+      const input = document.getElementById("wordInput").value.trim();
+      if (!input) return;
+      const newWords = input.split(/\n+/).map(w => w.trim()).filter(Boolean);
+      words.push(...newWords);
       renderWords();
       document.getElementById("wordInput").value = "";
     }
@@ -187,37 +179,36 @@
 
       const reader = new FileReader();
       reader.onload = function(e) {
-        const text = e.target.result;
-        const newWords = text.split(/\n+/).map(w => w.trim()).filter(Boolean);
-        wordList.push(...newWords);
+        const lines = e.target.result.split(/\r?\n/);
+        const newWords = lines.map(w => w.trim()).filter(Boolean);
+        words.push(...newWords);
         renderWords();
       };
       reader.readAsText(file);
     }
 
-    function saveWords() {
-      if (!userEmail) return alert("Please log in to save.");
-      localStorage.setItem("spellright-" + userEmail, JSON.stringify(wordList));
+    function saveWordList() {
+      if (!userEmail) return alert("Login with your email to save.");
+      localStorage.setItem("spellright-list-" + userEmail, JSON.stringify(words));
       alert("Saved!");
     }
 
-    function loadWords() {
-      if (!userEmail) return alert("Please log in to load.");
-      const saved = localStorage.getItem("spellright-" + userEmail);
+    function loadWordList() {
+      if (!userEmail) return alert("Login with your email to load.");
+      const saved = localStorage.getItem("spellright-list-" + userEmail);
       if (saved) {
-        wordList = JSON.parse(saved);
+        words = JSON.parse(saved);
         renderWords();
+        alert("Loaded!");
       } else {
-        alert("No saved list found.");
+        alert("No list found for this email.");
       }
     }
 
-    function clearWords() {
-      wordList = [];
+    function clearWordList() {
+      words = [];
       renderWords();
     }
-
-    renderWords(); // Start with empty list
   </script>
 </body>
 </html>
