@@ -64,6 +64,7 @@
         <option value="en-AU">Australian</option>
       </select>
     </label>
+    <button onclick="speakAllWords()">▶️ Speak All</button>
   </div>
 
   <div id="trainer"></div>
@@ -73,8 +74,6 @@
     <textarea id="wordInput" rows="4" placeholder="One word per line..."></textarea><br>
     <button onclick="addCustomWords()">➕ Add Words</button>
     <input type="file" id="fileUpload" accept=".txt" onchange="handleFileUpload(event)" />
-    <br><br>
-    <button onclick="speakAllWords()" id="speakAllBtn">▶️ Speak All</button>
   </div>
 
   <div id="saveControls">
@@ -119,7 +118,6 @@
         const utterance = new SpeechSynthesisUtterance(words[i]);
         utterance.lang = currentAccent;
         utterance.rate = 0.8;
-
         utterance.onend = () => {
           i++;
           speakNext();
@@ -128,7 +126,11 @@
         speechSynthesis.speak(utterance);
       }
 
-      speakNext();
+      if (words.length > 0) {
+        speakNext();
+      } else {
+        alert("No words to speak.");
+      }
     }
 
     function checkSpelling(input, correct, status) {
