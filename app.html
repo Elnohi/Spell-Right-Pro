@@ -64,16 +64,13 @@
         <option value="en-AU">Australian</option>
       </select>
     </label>
-    <label style="margin-left: 20px;">
-      <input type="checkbox" id="autoSpeakToggle" checked /> 🔊 Auto Speak
-    </label>
   </div>
 
   <div id="trainer"></div>
 
   <div id="uploadSection">
     <h3>Add Words</h3>
-    <textarea id="wordInput" rows="4" placeholder="Enter words (comma, slash, space, or newline separated)..."></textarea><br>
+    <textarea id="wordInput" rows="4" placeholder="Type words using commas, slashes, or multiple spaces (e.g. cat, dog / horse  lion)..."></textarea><br>
     <button onclick="addCustomWords()">➕ Add Words</button>
     <input type="file" id="fileUpload" accept=".txt" onchange="handleFileUpload(event)" />
   </div>
@@ -104,16 +101,6 @@
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = currentAccent;
       speechSynthesis.speak(utterance);
-    }
-
-    function speakAllWords() {
-      if (!document.getElementById("autoSpeakToggle").checked) return;
-      words.forEach((word, i) => {
-        const utterance = new SpeechSynthesisUtterance(word);
-        utterance.lang = currentAccent;
-        utterance.rate = 0.9;
-        speechSynthesis.speak(utterance);
-      });
     }
 
     function checkSpelling(input, correct, status) {
@@ -178,18 +165,18 @@
     }
 
     function addCustomWords() {
-      const text = document.getElementById("wordInput").value.trim();
-      if (!text) return;
-
-      const newWords = text
-        .split(/[\n,\/]+|\s{2,}/)  // split on newlines, commas, slashes, or multiple spaces
-        .map(w => w.trim())
-        .filter(Boolean);
-
+      const input = document.getElementById("wordInput").value.trim();
+      if (!input) return;
+      const separators = /[\n,\/]+|\s{2,}/g;
+      const newWords = input.split(separators).map(w => w.trim()).filter(Boolean);
       words.push(...newWords);
       renderWords();
       document.getElementById("wordInput").value = "";
-      speakAllWords(); // speak all words after adding
+
+      // Speak all new words one by one
+      newWords.forEach((word, i) => {
+        setTimeout(() => speak(word), i * 1000);
+      });
     }
 
     function handleFileUpload(event) {
@@ -198,11 +185,13 @@
 
       const reader = new FileReader();
       reader.onload = function(e) {
-        const lines = e.target.result.split(/[\n,\/]+|\s{2,}/);
+        const lines = e.target.result.split(/\r?\n/);
         const newWords = lines.map(w => w.trim()).filter(Boolean);
         words.push(...newWords);
         renderWords();
-        speakAllWords();
+        newWords.forEach((word, i) => {
+          setTimeout(() => speak(word), i * 1000);
+        });
       };
       reader.readAsText(file);
     }
