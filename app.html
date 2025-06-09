@@ -104,16 +104,6 @@
       currentAccent = document.getElementById("accentSelect").value;
     }
 
-    function speakSequentially(wordList, index = 0) {
-      if (index >= wordList.length) return;
-
-      const utterance = new SpeechSynthesisUtterance(wordList[index]);
-      utterance.lang = currentAccent;
-
-      utterance.onend = () => speakSequentially(wordList, index + 1);
-      speechSynthesis.speak(utterance);
-    }
-
     function speak(text) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = currentAccent;
@@ -184,12 +174,15 @@
     function addCustomWords() {
       const input = document.getElementById("wordInput").value.trim();
       const asPhrases = document.getElementById("phraseToggle").checked;
+
       if (!input) return;
 
       let newWords = [];
       if (asPhrases) {
+        // Treat each phrase split by common delimiters as a single unit
         newWords = input.split(/[\n,\/\-]+/).map(w => w.trim()).filter(Boolean);
       } else {
+        // Split into individual words
         newWords = input
           .split(/[\n,\/\-]+|\s{2,}/g)
           .flatMap(phrase => phrase.trim().split(/\s+/))
@@ -200,7 +193,9 @@
       renderWords();
       document.getElementById("wordInput").value = "";
 
-      speakSequentially(newWords);
+      newWords.forEach((word, i) => {
+        setTimeout(() => speak(word), i * 1000);
+      });
     }
 
     function handleFileUpload(event) {
@@ -224,7 +219,9 @@
 
         words.push(...newWords);
         renderWords();
-        speakSequentially(newWords);
+        newWords.forEach((word, i) => {
+          setTimeout(() => speak(word), i * 1000);
+        });
       };
       reader.readAsText(file);
     }
