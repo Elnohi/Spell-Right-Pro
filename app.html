@@ -39,37 +39,68 @@
       font-weight: bold;
       margin-left: 10px;
     }
-    #accentSelect {
-      margin: 10px 0;
+    textarea {
+      width: 100%;
+      margin-top: 10px;
+    }
+    #uploadSection, #saveSection, #accentSelect, #loginSection {
+      margin-top: 30px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
   </style>
 </head>
 <body>
   <h1>🔤 Spell Right Pro</h1>
 
-  <label for="accentSelect">Choose Accent:</label>
-  <select id="accentSelect" onchange="changeAccent()">
-    <option value="en-GB">British</option>
-    <option value="en-US">American</option>
-    <option value="en-CA">Canadian</option>
-    <option value="en-AU">Australian</option>
-  </select>
+  <div id="loginSection">
+    <label>Email: <input type="email" id="userEmail" /></label>
+    <button onclick="loginUser()">🔐 Login</button>
+    <span id="loginStatus"></span>
+  </div>
+
+  <div id="accentSelect">
+    <label>Choose Accent:</label>
+    <select onchange="changeAccent(this)">
+      <option value="en-GB">British</option>
+      <option value="en-US">American</option>
+      <option value="en-CA">Canadian</option>
+      <option value="en-AU">Australian</option>
+    </select>
+  </div>
 
   <div id="trainer"></div>
 
+  <div id="uploadSection">
+    <h2>Add Your Own Words</h2>
+    <textarea id="wordInput" rows="4" placeholder="Enter words, one per line..."></textarea><br>
+    <button onclick="addWords()">➕ Add Words</button>
+    <input type="file" accept=".txt" onchange="handleFileUpload(event)" />
+  </div>
+
+  <div id="saveSection">
+    <button onclick="saveWords()">💾 Save</button>
+    <button onclick="loadWords()">📂 Load</button>
+    <button onclick="clearWords()">🗑 Clear</button>
+  </div>
+
   <script>
-    const wordList = [
-      "Nausea", "Vitamin B12", "Angina", "Chills", "Shivering",
-      "Bloating", "Groin", "Confidence", "Antisocial", "Cloudy",
-      "Full blood count", "Gastric bypass", "Confusion", "Fingertips",
-      "Swallowing", "Indigestion", "Spotting", "Painkillers", "Lethargic",
-      "Cold compress", "Ribcage", "Drained", "Itching", "Above normal"
-    ];
+    let wordList = [];
+    let currentAccent = "en-GB";
+    let userEmail = "";
 
-    let currentAccent = 'en-GB';
+    function loginUser() {
+      userEmail = document.getElementById("userEmail").value.trim();
+      if (userEmail) {
+        document.getElementById("loginStatus").textContent = "Logged in as " + userEmail;
+        loadWords();
+      }
+    }
 
-    function changeAccent() {
-      currentAccent = document.getElementById("accentSelect").value;
+    function changeAccent(select) {
+      currentAccent = select.value;
     }
 
     function speak(text) {
@@ -78,15 +109,15 @@
       speechSynthesis.speak(utterance);
     }
 
-    function checkSpelling(input, correctWord, statusSpan) {
+    function checkSpelling(input, correct, status) {
       const typed = input.value.trim().toLowerCase();
-      const expected = correctWord.trim().toLowerCase();
+      const expected = correct.trim().toLowerCase();
       if (typed === expected) {
-        statusSpan.textContent = "✅ Correct";
-        statusSpan.style.color = "green";
+        status.textContent = "✅ Correct";
+        status.style.color = "green";
       } else {
-        statusSpan.textContent = "❌ Wrong";
-        statusSpan.style.color = "red";
+        status.textContent = "❌ Wrong";
+        status.style.color = "red";
       }
     }
 
@@ -135,13 +166,58 @@
       document.getElementById("trainer").appendChild(box);
     }
 
-    function initTrainer() {
-      document.getElementById("trainer").innerHTML = "";
+    function renderWords() {
+      const trainer = document.getElementById("trainer");
+      trainer.innerHTML = "";
       wordList.forEach((word, index) => createWordBox(word, index));
     }
 
-    // Initial load
-    initTrainer();
+    function addWords() {
+      const text = document.getElementById("wordInput").value.trim();
+      if (!text) return;
+      const newWords = text.split(/\n+/).map(w => w.trim()).filter(Boolean);
+      wordList.push(...newWords);
+      renderWords();
+      document.getElementById("wordInput").value = "";
+    }
+
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const newWords = text.split(/\n+/).map(w => w.trim()).filter(Boolean);
+        wordList.push(...newWords);
+        renderWords();
+      };
+      reader.readAsText(file);
+    }
+
+    function saveWords() {
+      if (!userEmail) return alert("Please log in to save.");
+      localStorage.setItem("spellright-" + userEmail, JSON.stringify(wordList));
+      alert("Saved!");
+    }
+
+    function loadWords() {
+      if (!userEmail) return alert("Please log in to load.");
+      const saved = localStorage.getItem("spellright-" + userEmail);
+      if (saved) {
+        wordList = JSON.parse(saved);
+        renderWords();
+      } else {
+        alert("No saved list found.");
+      }
+    }
+
+    function clearWords() {
+      wordList = [];
+      renderWords();
+    }
+
+    renderWords(); // Start with empty list
   </script>
 </body>
 </html>
