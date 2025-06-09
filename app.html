@@ -102,9 +102,12 @@
       font-weight: bold;
     }
 
-    #nextBtn {
-      display: none;
+    #startBtn {
       margin-top: 20px;
+    }
+
+    .hidden {
+      display: none;
     }
   </style>
 </head>
@@ -121,14 +124,17 @@
       <input type="file" id="wordFile" accept=".txt" />
       <p>Upload a text file with one word per line</p>
       
-      <div id="trainingControls" style="display: none;">
+      <div id="trainingControls" class="hidden">
         <div id="progress">Word 1 of 0</div>
-        <button id="speakBtn" class="btn-primary">Hear the Word</button>
-        <input type="text" id="wordInput" placeholder="Type the word you hear" />
-        <button id="checkBtn" class="btn-primary">Check Spelling</button>
+        <div id="status">Listen to the word...</div>
+        <input type="text" id="wordInput" placeholder="Type the word you hear" class="hidden" />
+        <button id="checkBtn" class="btn-primary hidden">Check Spelling</button>
         <div id="feedback"></div>
-        <button id="nextBtn" class="btn-primary">Next Word</button>
+        <button id="nextBtn" class="btn-primary hidden">Next Word</button>
+        <button id="repeatBtn" class="btn-primary hidden">Repeat Word</button>
       </div>
+
+      <button id="startBtn" class="btn-primary hidden">Start Training</button>
     </div>
   </main>
 
@@ -148,9 +154,13 @@
       const reader = new FileReader();
       reader.onload = function(e) {
         const content = e.target.result;
-        words = content.split('\n').filter(word => word.trim() !== '');
+        words = content.split('\n')
+                      .map(word => word.trim())
+                      .filter(word => word !== '');
+        
         if (words.length > 0) {
-          document.getElementById('trainingControls').style.display = 'block';
+          document.getElementById('startBtn').classList.remove('hidden');
+          document.getElementById('trainingControls').classList.remove('hidden');
           updateProgress();
         } else {
           alert('The file is empty or contains no valid words.');
@@ -159,41 +169,68 @@
       reader.readAsText(file);
     });
 
-    document.getElementById('speakBtn').addEventListener('click', function() {
-      if (words.length === 0) return;
+    document.getElementById('startBtn').addEventListener('click', function() {
+      this.classList.add('hidden');
+      speakCurrentWord();
+    });
+
+    function speakCurrentWord() {
+      if (words.length === 0 || currentWordIndex >= words.length) return;
+      
+      document.getElementById('status').textContent = "Listen to the word...";
+      document.getElementById('wordInput').classList.add('hidden');
+      document.getElementById('checkBtn').classList.add('hidden');
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('nextBtn').classList.add('hidden');
+      document.getElementById('repeatBtn').classList.add('hidden');
       
       const utterance = new SpeechSynthesisUtterance(words[currentWordIndex]);
       utterance.rate = 0.8;
+      
+      utterance.onend = function() {
+        document.getElementById('status').textContent = "Now type the word you heard:";
+        document.getElementById('wordInput').value = '';
+        document.getElementById('wordInput').classList.remove('hidden');
+        document.getElementById('checkBtn').classList.remove('hidden');
+        document.getElementById('repeatBtn').classList.remove('hidden');
+        document.getElementById('wordInput').focus();
+      };
+      
       synth.speak(utterance);
-    });
+    }
 
     document.getElementById('checkBtn').addEventListener('click', function() {
       if (words.length === 0) return;
       
       const userInput = document.getElementById('wordInput').value.trim();
-      const correctWord = words[currentWordIndex].trim();
+      const correctWord = words[currentWordIndex];
       const feedback = document.getElementById('feedback');
       
       if (userInput.toLowerCase() === correctWord.toLowerCase()) {
         feedback.textContent = "Correct! Well done!";
         feedback.className = "correct";
-        document.getElementById('nextBtn').style.display = 'inline-block';
       } else {
         feedback.textContent = `Incorrect. The correct spelling is: ${correctWord}`;
         feedback.className = "incorrect";
       }
+      
+      document.getElementById('nextBtn').classList.remove('hidden');
+      document.getElementById('checkBtn').classList.add('hidden');
     });
 
     document.getElementById('nextBtn').addEventListener('click', function() {
       currentWordIndex++;
       if (currentWordIndex >= words.length) {
         currentWordIndex = 0;
+        alert("You've completed all words! Starting over.");
       }
       
-      document.getElementById('wordInput').value = '';
-      document.getElementById('feedback').textContent = '';
-      document.getElementById('nextBtn').style.display = 'none';
       updateProgress();
+      speakCurrentWord();
+    });
+
+    document.getElementById('repeatBtn').addEventListener('click', function() {
+      speakCurrentWord();
     });
 
     function updateProgress() {
