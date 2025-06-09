@@ -4,67 +4,60 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Spell Right Pro</title>
-  <link rel="icon" href="logo.png" type="image/png">
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f2f6fa;
-      margin: 0;
+      font-family: Arial, sans-serif;
       padding: 20px;
-      color: #333;
-    }
-    header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    header img {
-      width: 80px;
-      height: auto;
-    }
-    header h1 {
-      margin: 10px 0 5px;
-      font-size: 2em;
-      color: #005baa;
+      background-color: #f0f4f8;
     }
     .word-box {
-      background-color: #fff;
-      padding: 20px;
       margin-bottom: 20px;
+      padding: 15px;
+      background: white;
       border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    .word-box button {
-      margin: 5px 10px 5px 0;
+    button {
+      margin-right: 10px;
+    }
+    input[type="text"] {
+      padding: 5px;
+      width: 200px;
+    }
+    .hidden-word {
+      font-family: monospace;
+      letter-spacing: 2px;
     }
     .status {
       font-weight: bold;
       margin-left: 10px;
     }
-    #controls, #accentSelect, #userEmail {
-      margin: 10px 0;
-    }
-    #uploadSection, #saveControls {
+    #uploadSection, #loginSection, #accentSection, #saveControls {
       margin-top: 30px;
+      padding: 15px;
       background: #fff;
-      padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    #logo {
+      height: 50px;
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
-  <header>
-    <img src="logo.png" alt="Spell Right Pro Logo">
-    <h1>Spell Right Pro</h1>
-    <p>Train your spelling by ear — smart, fun, and accent-aware.</p>
-  </header>
+  <img id="logo" src="logo.png" alt="Spell Right Pro Logo">
+  <h1>Spell Right Pro</h1>
+  <p>Click "Speak" to hear the word. Type what you hear. Reveal and check the correct spelling. You can add, save, or load word lists.</p>
 
-  <div id="controls">
-    <input type="email" id="userEmail" placeholder="Enter your email to save progress" />
-    <button onclick="loginUser()">Login</button>
+  <div id="loginSection">
+    <label>Email: <input type="email" id="userEmail" /></label>
+    <button onclick="loginUser()">🔐 Login</button>
     <span id="loginStatus"></span>
-    <br>
-    <label for="accentSelect">Accent: </label>
+  </div>
+
+  <div id="accentSection">
+    <label for="accentSelect">Choose Accent: </label>
     <select id="accentSelect" onchange="changeAccent()">
       <option value="en-GB">British</option>
       <option value="en-US">American</option>
@@ -76,23 +69,23 @@
   <div id="trainer"></div>
 
   <div id="uploadSection">
-    <h2>Upload Your Words</h2>
-    <textarea id="wordInput" rows="4" style="width:100%;" placeholder="Paste one word per line..."></textarea>
-    <button onclick="addCustomWords()">Add Words</button>
-    <br><br>
+    <h2>Add Your Own Words</h2>
+    <textarea id="wordInput" rows="4" style="width:100%;" placeholder="Paste words here, one per line..."></textarea><br>
+    <button onclick="addCustomWords()">➕ Add Words</button>
     <input type="file" id="fileUpload" accept=".txt,.doc,.docx,.pdf" onchange="handleFileUpload(event)" />
   </div>
 
   <div id="saveControls">
-    <button onclick="saveWordList()">Save List</button>
-    <button onclick="loadWordList()">Load List</button>
-    <button onclick="clearWordList()">Clear All</button>
+    <button onclick="saveWordList()">💾 Save List</button>
+    <button onclick="loadWordList()">📂 Load List</button>
+    <button onclick="clearWordList()">🗑 Clear All</button>
   </div>
 
   <script>
     let words = [];
     let userEmail = "";
     let currentAccent = 'en-GB';
+
     const trainerDiv = document.getElementById("trainer");
 
     function loginUser() {
@@ -111,10 +104,10 @@
         <strong>Word ${index + 1}</strong><br>
         <button onclick="speak('${word}')">🔊 Speak</button>
         <input type="text" placeholder="Type your spelling here" />
-        <button onclick="checkSpelling(this, '${word}')">Check</button>
+        <button onclick="checkSpelling(this, '${word}')">✔️ Check</button>
         <span class="status"></span>
         <br><button onclick="this.nextElementSibling.style.display='inline'">👁 Show</button>
-        <span class="hidden-word" style="display:none; font-family:monospace;"> ${word} </span>
+        <span class="hidden-word" style="display:none;"> ${word} </span>
       `;
       trainerDiv.appendChild(box);
     }
@@ -127,6 +120,8 @@
     function speak(text) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = currentAccent;
+      utterance.rate = 0.9;
+      speechSynthesis.cancel();
       speechSynthesis.speak(utterance);
     }
 
@@ -153,6 +148,7 @@
     function handleFileUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
+
       const reader = new FileReader();
       reader.onload = function(e) {
         const content = e.target.result;
@@ -160,7 +156,12 @@
         newWords.forEach(w => words.push(w));
         initWords();
       };
-      reader.readAsText(file);
+
+      if (file.type.includes("text") || file.name.endsWith(".txt")) {
+        reader.readAsText(file);
+      } else {
+        alert("Only .txt, .docx, and .pdf files are partially supported. Use .txt for best results.");
+      }
     }
 
     function saveWordList() {
@@ -185,6 +186,8 @@
       words = [];
       initWords();
     }
+
+    initWords();
   </script>
 </body>
 </html>
