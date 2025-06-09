@@ -3,322 +3,240 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Spell Right Pro - Training</title>
-  <link rel="icon" href="logo.png" />
+  <title>Spell Right Pro</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f7fafc;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-      color: #333;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f0f4f8;
     }
-
-    header {
-      background-color: #0057b7;
-      color: white;
-      padding: 30px 15px;
-    }
-
-    header h1 {
-      font-size: 2.5em;
-      margin-bottom: 10px;
-    }
-
-    header p {
-      font-size: 1.2em;
-      margin: 0;
-    }
-
-    main {
-      padding: 40px 20px;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .btn-primary {
-      background-color: #0057b7;
-      color: white;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1em;
-      cursor: pointer;
-      transition: background 0.3s;
-      margin-top: 20px;
-    }
-
-    .btn-primary:hover {
-      background-color: #0041a3;
-    }
-
-    footer {
-      background: #eee;
-      padding: 10px;
-      font-size: 0.9em;
-      margin-top: 40px;
-    }
-
-    img.logo {
-      width: 100px;
-      margin-bottom: 15px;
-    }
-
-    .training-area {
+    .word-box {
+      margin-bottom: 20px;
+      padding: 15px;
       background: white;
       border-radius: 10px;
-      padding: 30px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    button {
+      margin: 5px 5px 5px 0;
+    }
+    input[type="text"] {
+      padding: 5px;
+      width: 250px;
+    }
+    .status {
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    .hidden-word {
+      font-family: monospace;
+      letter-spacing: 1px;
+      display: none;
+    }
+    #uploadSection, #saveControls, #loginSection, #accentSection {
       margin-top: 30px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-
-    #wordInput {
-      padding: 12px;
-      font-size: 1.2em;
-      width: 300px;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      margin: 20px 0;
-    }
-
-    #feedback {
-      font-size: 1.2em;
-      font-weight: bold;
-      min-height: 30px;
-      margin: 20px 0;
-    }
-
-    .correct {
-      color: green;
-    }
-
-    .incorrect {
-      color: red;
-    }
-
-    #progress {
-      margin: 20px 0;
-      font-weight: bold;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .tab-container {
-      display: flex;
-      margin-bottom: 20px;
-    }
-
-    .tab {
-      flex: 1;
-      padding: 10px;
-      cursor: pointer;
-      background: #ddd;
-      border: none;
-    }
-
-    .tab.active {
-      background: #0057b7;
-      color: white;
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    #wordListTextarea {
+    textarea {
       width: 100%;
-      height: 150px;
-      padding: 10px;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      font-family: inherit;
-      margin-bottom: 15px;
-    }
-
-    .instructions {
-      font-size: 0.9em;
-      color: #666;
-      margin-bottom: 15px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <header>
-    <img src="logo.png" alt="Spell Right Pro Logo" class="logo"/>
-    <h1>Spell Right Pro</h1>
-    <p>Your smart accent-based spelling trainer</p>
-  </header>
+  <h1>Spell Right Pro</h1>
 
-  <main>
-    <div class="training-area">
-      <h2>Spelling Training</h2>
+  <div id="loginSection">
+    <label>Email: <input type="email" id="userEmail" /></label>
+    <button onclick="loginUser()">🔐 Login</button>
+    <span id="loginStatus"></span>
+  </div>
 
-      <div class="tab-container">
-        <button class="tab active" onclick="openTab(event, 'uploadTab')">Upload File</button>
-        <button class="tab" onclick="openTab(event, 'manualTab')">Enter Words</button>
-      </div>
+  <div id="accentSection">
+    <label>Accent:
+      <select id="accentSelect" onchange="changeAccent()">
+        <option value="en-GB">British</option>
+        <option value="en-US">American</option>
+        <option value="en-CA">Canadian</option>
+        <option value="en-AU">Australian</option>
+      </select>
+    </label>
+  </div>
 
-      <div id="uploadTab" class="tab-content active">
-        <input type="file" id="wordFile" accept=".txt" />
-        <p class="instructions">Upload a text file with one word per line</p>
-      </div>
+  <div id="trainer"></div>
 
-      <div id="manualTab" class="tab-content">
-        <textarea id="wordListTextarea" placeholder="Enter words here, one per line"></textarea>
-        <p class="instructions">Type or paste your words, one per line</p>
-      </div>
+  <div id="uploadSection">
+    <h3>Add Words</h3>
+    <textarea id="wordInput" rows="4" placeholder="One word per line..."></textarea><br>
+    <button onclick="addCustomWords()">➕ Add Words</button>
+    <input type="file" id="fileUpload" accept=".txt" onchange="handleFileUpload(event)" />
+    <br><br>
+    <button onclick="speakAllWords()" id="speakAllBtn">▶️ Speak All</button>
+  </div>
 
-      <button id="loadWordsBtn" class="btn-primary">Load Words</button>
-
-      <div id="trainingControls" class="hidden">
-        <div id="progress">Word 1 of 0</div>
-        <div id="status">Press Start to begin</div>
-        <input type="text" id="wordInput" placeholder="Type the word you hear" class="hidden" autocomplete="off" />
-        <button id="checkBtn" class="btn-primary hidden">Check Spelling</button>
-        <div id="feedback"></div>
-        <button id="nextBtn" class="btn-primary hidden">Next Word</button>
-        <button id="repeatBtn" class="btn-primary hidden">Repeat Word</button>
-        <button id="startBtn" class="btn-primary">Start Training</button>
-      </div>
-    </div>
-  </main>
-
-  <footer>
-    &copy; 2025 Spell Right Pro. All rights reserved.
-  </footer>
+  <div id="saveControls">
+    <button onclick="saveWordList()">💾 Save List</button>
+    <button onclick="loadWordList()">📂 Load List</button>
+    <button onclick="clearWordList()">🗑 Clear</button>
+  </div>
 
   <script>
     let words = [];
-    let currentWordIndex = 0;
-    let score = 0;
-    const synth = window.speechSynthesis;
+    let userEmail = "";
+    let currentAccent = 'en-GB';
 
-    function openTab(event, tabId) {
-      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-      event.currentTarget.classList.add('active');
+    const trainerDiv = document.getElementById("trainer");
+
+    function loginUser() {
+      userEmail = document.getElementById("userEmail").value.trim();
+      document.getElementById("loginStatus").textContent = userEmail ? `Logged in as ${userEmail}` : '';
     }
 
-    document.getElementById('loadWordsBtn').addEventListener('click', () => {
-      const uploadTabActive = document.getElementById('uploadTab').classList.contains('active');
-      if (uploadTabActive) {
-        const file = document.getElementById('wordFile').files[0];
-        if (!file) return alert('Please select a file first');
-        const reader = new FileReader();
-        reader.onload = e => processWordList(e.target.result);
-        reader.readAsText(file);
-      } else {
-        const text = document.getElementById('wordListTextarea').value;
-        processWordList(text);
-      }
-    });
+    function changeAccent() {
+      currentAccent = document.getElementById("accentSelect").value;
+    }
 
-    function processWordList(content) {
-      words = content.split('\n').map(w => w.trim()).filter(w => w !== '');
-      if (words.length > 0) {
-        document.getElementById('trainingControls').classList.remove('hidden');
-        document.getElementById('startBtn').classList.remove('hidden');
-        currentWordIndex = 0;
-        score = 0;
-        updateProgress();
-        document.getElementById('status').textContent = "Press Start to begin";
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = currentAccent;
+      speechSynthesis.speak(utterance);
+    }
+
+    function speakAllWords() {
+      if (speechSynthesis.speaking) {
+        alert("Please wait until the current speech finishes.");
+        return;
+      }
+
+      let i = 0;
+
+      function speakNext() {
+        if (i >= words.length) return;
+
+        const utterance = new SpeechSynthesisUtterance(words[i]);
+        utterance.lang = currentAccent;
+        utterance.rate = 0.8;
+
+        utterance.onend = () => {
+          i++;
+          speakNext();
+        };
+
+        speechSynthesis.speak(utterance);
+      }
+
+      speakNext();
+    }
+
+    function checkSpelling(input, correct, status) {
+      const typed = input.value.trim().toLowerCase();
+      const expected = correct.toLowerCase();
+      if (typed === expected) {
+        status.textContent = "✅ Correct";
+        status.style.color = "green";
       } else {
-        alert('No valid words found. Please check your input.');
+        status.textContent = "❌ Wrong";
+        status.style.color = "red";
       }
     }
 
-    document.getElementById('startBtn').addEventListener('click', function () {
-      this.classList.add('hidden');
-      speakCurrentWord();
-    });
+    function createBox(word, index) {
+      const box = document.createElement("div");
+      box.className = "word-box";
 
-    function speakCurrentWord() {
-      if (words.length === 0 || currentWordIndex >= words.length) return;
+      const title = document.createElement("div");
+      title.innerHTML = `<strong>Word ${index + 1}</strong>`;
 
-      const status = document.getElementById('status');
-      const wordInput = document.getElementById('wordInput');
-      const checkBtn = document.getElementById('checkBtn');
-      const repeatBtn = document.getElementById('repeatBtn');
-      const nextBtn = document.getElementById('nextBtn');
-      const feedback = document.getElementById('feedback');
+      const speakBtn = document.createElement("button");
+      speakBtn.textContent = "🔊 Speak";
+      speakBtn.onclick = () => speak(word);
 
-      status.textContent = "Listen to the word...";
-      wordInput.classList.add('hidden');
-      checkBtn.classList.add('hidden');
-      feedback.textContent = '';
-      nextBtn.classList.add('hidden');
-      repeatBtn.classList.add('hidden');
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "Type what you heard...";
 
-      const utterance = new SpeechSynthesisUtterance(words[currentWordIndex]);
-      utterance.rate = 0.8;
+      const checkBtn = document.createElement("button");
+      checkBtn.textContent = "✔️ Check";
 
-      utterance.onend = () => {
-        status.textContent = "Now type the word you heard:";
-        wordInput.value = '';
-        wordInput.classList.remove('hidden');
-        checkBtn.classList.remove('hidden');
-        repeatBtn.classList.remove('hidden');
-        wordInput.focus();
+      const status = document.createElement("span");
+      status.className = "status";
+
+      checkBtn.onclick = () => checkSpelling(input, word, status);
+
+      const revealBtn = document.createElement("button");
+      revealBtn.textContent = "👁 Show";
+
+      const hidden = document.createElement("span");
+      hidden.textContent = " " + word;
+      hidden.className = "hidden-word";
+
+      revealBtn.onclick = () => hidden.style.display = "inline";
+
+      box.appendChild(title);
+      box.appendChild(speakBtn);
+      box.appendChild(input);
+      box.appendChild(checkBtn);
+      box.appendChild(status);
+      box.appendChild(document.createElement("br"));
+      box.appendChild(revealBtn);
+      box.appendChild(hidden);
+
+      trainerDiv.appendChild(box);
+    }
+
+    function renderWords() {
+      trainerDiv.innerHTML = "";
+      words.forEach((word, index) => createBox(word, index));
+    }
+
+    function addCustomWords() {
+      const input = document.getElementById("wordInput").value.trim();
+      if (!input) return;
+      const newWords = input.split(/\n+/).map(w => w.trim()).filter(Boolean);
+      words.push(...newWords);
+      renderWords();
+      document.getElementById("wordInput").value = "";
+    }
+
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const lines = e.target.result.split(/\r?\n/);
+        const newWords = lines.map(w => w.trim()).filter(Boolean);
+        words.push(...newWords);
+        renderWords();
       };
-
-      synth.speak(utterance);
+      reader.readAsText(file);
     }
 
-    document.getElementById('checkBtn').addEventListener('click', () => {
-      if (words.length === 0) return;
+    function saveWordList() {
+      if (!userEmail) return alert("Login with your email to save.");
+      localStorage.setItem("spellright-list-" + userEmail, JSON.stringify(words));
+      alert("Saved!");
+    }
 
-      const input = document.getElementById('wordInput').value.trim();
-      const correct = words[currentWordIndex];
-      const feedback = document.getElementById('feedback');
-
-      if (input.toLowerCase() === correct.toLowerCase()) {
-        feedback.textContent = "Correct! Well done!";
-        feedback.className = "correct";
-        score++;
+    function loadWordList() {
+      if (!userEmail) return alert("Login with your email to load.");
+      const saved = localStorage.getItem("spellright-list-" + userEmail);
+      if (saved) {
+        words = JSON.parse(saved);
+        renderWords();
+        alert("Loaded!");
       } else {
-        feedback.textContent = `Incorrect. The correct spelling is: ${correct}`;
-        feedback.className = "incorrect";
+        alert("No list found for this email.");
       }
-
-      document.getElementById('nextBtn').classList.remove('hidden');
-      document.getElementById('checkBtn').classList.add('hidden');
-    });
-
-    document.getElementById('nextBtn').addEventListener('click', () => {
-      currentWordIndex++;
-      if (currentWordIndex >= words.length) {
-        alert(`You've completed all words!\nYour score: ${score} / ${words.length}`);
-        currentWordIndex = 0;
-        score = 0;
-        document.getElementById('startBtn').classList.remove('hidden');
-      }
-      updateProgress();
-      speakCurrentWord();
-    });
-
-    document.getElementById('repeatBtn').addEventListener('click', () => {
-      speakCurrentWord();
-    });
-
-    function updateProgress() {
-      document.getElementById('progress').textContent =
-        `Word ${currentWordIndex + 1} of ${words.length}`;
     }
 
-    document.getElementById('wordInput').addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        document.getElementById('checkBtn').click();
-      }
-    });
+    function clearWordList() {
+      words = [];
+      renderWords();
+    }
   </script>
 </body>
 </html>
