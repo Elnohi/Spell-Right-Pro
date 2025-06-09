@@ -102,10 +102,6 @@
       font-weight: bold;
     }
 
-    #startBtn {
-      margin-top: 20px;
-    }
-
     .hidden {
       display: none;
     }
@@ -163,28 +159,28 @@
   <main>
     <div class="training-area">
       <h2>Spelling Training</h2>
-      
+
       <div class="tab-container">
-        <button class="tab active" onclick="openTab('uploadTab')">Upload File</button>
-        <button class="tab" onclick="openTab('manualTab')">Enter Words</button>
+        <button class="tab active" onclick="openTab(event, 'uploadTab')">Upload File</button>
+        <button class="tab" onclick="openTab(event, 'manualTab')">Enter Words</button>
       </div>
-      
+
       <div id="uploadTab" class="tab-content active">
         <input type="file" id="wordFile" accept=".txt" />
         <p class="instructions">Upload a text file with one word per line</p>
       </div>
-      
+
       <div id="manualTab" class="tab-content">
         <textarea id="wordListTextarea" placeholder="Enter words here, one per line"></textarea>
         <p class="instructions">Type or paste your words, one per line</p>
       </div>
-      
+
       <button id="loadWordsBtn" class="btn-primary">Load Words</button>
-      
+
       <div id="trainingControls" class="hidden">
         <div id="progress">Word 1 of 0</div>
         <div id="status">Press Start to begin</div>
-        <input type="text" id="wordInput" placeholder="Type the word you hear" class="hidden" />
+        <input type="text" id="wordInput" placeholder="Type the word you hear" class="hidden" autocomplete="off" />
         <button id="checkBtn" class="btn-primary hidden">Check Spelling</button>
         <div id="feedback"></div>
         <button id="nextBtn" class="btn-primary hidden">Next Word</button>
@@ -201,38 +197,23 @@
   <script>
     let words = [];
     let currentWordIndex = 0;
+    let score = 0;
     const synth = window.speechSynthesis;
 
-    function openTab(tabId) {
-      // Hide all tab contents
-      document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.classList.remove('active');
-      });
-      
-      // Show the selected tab content
+    function openTab(event, tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
-      
-      // Update tab buttons
-      document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-      });
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
       event.currentTarget.classList.add('active');
     }
 
-    document.getElementById('loadWordsBtn').addEventListener('click', function() {
+    document.getElementById('loadWordsBtn').addEventListener('click', () => {
       const uploadTabActive = document.getElementById('uploadTab').classList.contains('active');
-      
       if (uploadTabActive) {
         const file = document.getElementById('wordFile').files[0];
-        if (!file) {
-          alert('Please select a file first');
-          return;
-        }
-        
+        if (!file) return alert('Please select a file first');
         const reader = new FileReader();
-        reader.onload = function(e) {
-          processWordList(e.target.result);
-        };
+        reader.onload = e => processWordList(e.target.result);
         reader.readAsText(file);
       } else {
         const text = document.getElementById('wordListTextarea').value;
@@ -241,14 +222,12 @@
     });
 
     function processWordList(content) {
-      words = content.split('\n')
-                    .map(word => word.trim())
-                    .filter(word => word !== '');
-      
+      words = content.split('\n').map(w => w.trim()).filter(w => w !== '');
       if (words.length > 0) {
         document.getElementById('trainingControls').classList.remove('hidden');
         document.getElementById('startBtn').classList.remove('hidden');
         currentWordIndex = 0;
+        score = 0;
         updateProgress();
         document.getElementById('status').textContent = "Press Start to begin";
       } else {
@@ -256,78 +235,87 @@
       }
     }
 
-    document.getElementById('startBtn').addEventListener('click', function() {
+    document.getElementById('startBtn').addEventListener('click', function () {
       this.classList.add('hidden');
       speakCurrentWord();
     });
 
     function speakCurrentWord() {
       if (words.length === 0 || currentWordIndex >= words.length) return;
-      
-      document.getElementById('status').textContent = "Listen to the word...";
-      document.getElementById('wordInput').classList.add('hidden');
-      document.getElementById('checkBtn').classList.add('hidden');
-      document.getElementById('feedback').textContent = '';
-      document.getElementById('nextBtn').classList.add('hidden');
-      document.getElementById('repeatBtn').classList.add('hidden');
-      
+
+      const status = document.getElementById('status');
+      const wordInput = document.getElementById('wordInput');
+      const checkBtn = document.getElementById('checkBtn');
+      const repeatBtn = document.getElementById('repeatBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const feedback = document.getElementById('feedback');
+
+      status.textContent = "Listen to the word...";
+      wordInput.classList.add('hidden');
+      checkBtn.classList.add('hidden');
+      feedback.textContent = '';
+      nextBtn.classList.add('hidden');
+      repeatBtn.classList.add('hidden');
+
       const utterance = new SpeechSynthesisUtterance(words[currentWordIndex]);
       utterance.rate = 0.8;
-      
-      utterance.onend = function() {
-        document.getElementById('status').textContent = "Now type the word you heard:";
-        document.getElementById('wordInput').value = '';
-        document.getElementById('wordInput').classList.remove('hidden');
-        document.getElementById('checkBtn').classList.remove('hidden');
-        document.getElementById('repeatBtn').classList.remove('hidden');
-        document.getElementById('wordInput').focus();
+
+      utterance.onend = () => {
+        status.textContent = "Now type the word you heard:";
+        wordInput.value = '';
+        wordInput.classList.remove('hidden');
+        checkBtn.classList.remove('hidden');
+        repeatBtn.classList.remove('hidden');
+        wordInput.focus();
       };
-      
+
       synth.speak(utterance);
     }
 
-    document.getElementById('checkBtn').addEventListener('click', function() {
+    document.getElementById('checkBtn').addEventListener('click', () => {
       if (words.length === 0) return;
-      
-      const userInput = document.getElementById('wordInput').value.trim();
-      const correctWord = words[currentWordIndex];
+
+      const input = document.getElementById('wordInput').value.trim();
+      const correct = words[currentWordIndex];
       const feedback = document.getElementById('feedback');
-      
-      if (userInput.toLowerCase() === correctWord.toLowerCase()) {
+
+      if (input.toLowerCase() === correct.toLowerCase()) {
         feedback.textContent = "Correct! Well done!";
         feedback.className = "correct";
+        score++;
       } else {
-        feedback.textContent = `Incorrect. The correct spelling is: ${correctWord}`;
+        feedback.textContent = `Incorrect. The correct spelling is: ${correct}`;
         feedback.className = "incorrect";
       }
-      
+
       document.getElementById('nextBtn').classList.remove('hidden');
       document.getElementById('checkBtn').classList.add('hidden');
     });
 
-    document.getElementById('nextBtn').addEventListener('click', function() {
+    document.getElementById('nextBtn').addEventListener('click', () => {
       currentWordIndex++;
       if (currentWordIndex >= words.length) {
+        alert(`You've completed all words!\nYour score: ${score} / ${words.length}`);
         currentWordIndex = 0;
-        alert("You've completed all words! Starting over.");
+        score = 0;
+        document.getElementById('startBtn').classList.remove('hidden');
       }
-      
       updateProgress();
       speakCurrentWord();
     });
 
-    document.getElementById('repeatBtn').addEventListener('click', function() {
+    document.getElementById('repeatBtn').addEventListener('click', () => {
       speakCurrentWord();
     });
 
     function updateProgress() {
-      document.getElementById('progress').textContent = 
+      document.getElementById('progress').textContent =
         `Word ${currentWordIndex + 1} of ${words.length}`;
     }
 
-    // Allow pressing Enter to check spelling
-    document.getElementById('wordInput').addEventListener('keypress', function(e) {
+    document.getElementById('wordInput').addEventListener('keypress', function (e) {
       if (e.key === 'Enter') {
+        e.preventDefault();
         document.getElementById('checkBtn').click();
       }
     });
