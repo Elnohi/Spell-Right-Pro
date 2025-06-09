@@ -109,6 +109,48 @@
     .hidden {
       display: none;
     }
+
+    .tab-container {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px;
+      cursor: pointer;
+      background: #ddd;
+      border: none;
+    }
+
+    .tab.active {
+      background: #0057b7;
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    #wordListTextarea {
+      width: 100%;
+      height: 150px;
+      padding: 10px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-family: inherit;
+      margin-bottom: 15px;
+    }
+
+    .instructions {
+      font-size: 0.9em;
+      color: #666;
+      margin-bottom: 15px;
+    }
   </style>
 </head>
 <body>
@@ -121,20 +163,34 @@
   <main>
     <div class="training-area">
       <h2>Spelling Training</h2>
-      <input type="file" id="wordFile" accept=".txt" />
-      <p>Upload a text file with one word per line</p>
+      
+      <div class="tab-container">
+        <button class="tab active" onclick="openTab('uploadTab')">Upload File</button>
+        <button class="tab" onclick="openTab('manualTab')">Enter Words</button>
+      </div>
+      
+      <div id="uploadTab" class="tab-content active">
+        <input type="file" id="wordFile" accept=".txt" />
+        <p class="instructions">Upload a text file with one word per line</p>
+      </div>
+      
+      <div id="manualTab" class="tab-content">
+        <textarea id="wordListTextarea" placeholder="Enter words here, one per line"></textarea>
+        <p class="instructions">Type or paste your words, one per line</p>
+      </div>
+      
+      <button id="loadWordsBtn" class="btn-primary">Load Words</button>
       
       <div id="trainingControls" class="hidden">
         <div id="progress">Word 1 of 0</div>
-        <div id="status">Listen to the word...</div>
+        <div id="status">Press Start to begin</div>
         <input type="text" id="wordInput" placeholder="Type the word you hear" class="hidden" />
         <button id="checkBtn" class="btn-primary hidden">Check Spelling</button>
         <div id="feedback"></div>
         <button id="nextBtn" class="btn-primary hidden">Next Word</button>
         <button id="repeatBtn" class="btn-primary hidden">Repeat Word</button>
+        <button id="startBtn" class="btn-primary">Start Training</button>
       </div>
-
-      <button id="startBtn" class="btn-primary hidden">Start Training</button>
     </div>
   </main>
 
@@ -147,27 +203,58 @@
     let currentWordIndex = 0;
     const synth = window.speechSynthesis;
 
-    document.getElementById('wordFile').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
+    function openTab(tabId) {
+      // Hide all tab contents
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Show the selected tab content
+      document.getElementById(tabId).classList.add('active');
+      
+      // Update tab buttons
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      event.currentTarget.classList.add('active');
+    }
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const content = e.target.result;
-        words = content.split('\n')
-                      .map(word => word.trim())
-                      .filter(word => word !== '');
-        
-        if (words.length > 0) {
-          document.getElementById('startBtn').classList.remove('hidden');
-          document.getElementById('trainingControls').classList.remove('hidden');
-          updateProgress();
-        } else {
-          alert('The file is empty or contains no valid words.');
+    document.getElementById('loadWordsBtn').addEventListener('click', function() {
+      const uploadTabActive = document.getElementById('uploadTab').classList.contains('active');
+      
+      if (uploadTabActive) {
+        const file = document.getElementById('wordFile').files[0];
+        if (!file) {
+          alert('Please select a file first');
+          return;
         }
-      };
-      reader.readAsText(file);
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          processWordList(e.target.result);
+        };
+        reader.readAsText(file);
+      } else {
+        const text = document.getElementById('wordListTextarea').value;
+        processWordList(text);
+      }
     });
+
+    function processWordList(content) {
+      words = content.split('\n')
+                    .map(word => word.trim())
+                    .filter(word => word !== '');
+      
+      if (words.length > 0) {
+        document.getElementById('trainingControls').classList.remove('hidden');
+        document.getElementById('startBtn').classList.remove('hidden');
+        currentWordIndex = 0;
+        updateProgress();
+        document.getElementById('status').textContent = "Press Start to begin";
+      } else {
+        alert('No valid words found. Please check your input.');
+      }
+    }
 
     document.getElementById('startBtn').addEventListener('click', function() {
       this.classList.add('hidden');
@@ -237,6 +324,13 @@
       document.getElementById('progress').textContent = 
         `Word ${currentWordIndex + 1} of ${words.length}`;
     }
+
+    // Allow pressing Enter to check spelling
+    document.getElementById('wordInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('checkBtn').click();
+      }
+    });
   </script>
 </body>
 </html>
