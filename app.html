@@ -2,112 +2,103 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Spell Right Pro</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
       padding: 20px;
-      background-color: #f0f4f8;
     }
-    .word-box {
-      margin-bottom: 20px;
-      padding: 15px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    button {
-      margin: 5px 5px 5px 0;
+    .card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: auto;
+      text-align: center;
     }
     input[type="text"] {
-      padding: 5px;
-      width: 250px;
+      padding: 10px;
+      width: 80%;
+      margin: 10px auto;
+      font-size: 16px;
     }
-    .status {
-      font-weight: bold;
-      margin-left: 10px;
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
     }
     .hidden-word {
-      font-family: monospace;
-      letter-spacing: 1px;
       display: none;
-    }
-    #uploadSection, #saveControls, #loginSection, #accentSection {
-      margin-top: 30px;
-      padding: 15px;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    textarea {
-      width: 100%;
       margin-top: 10px;
+      font-weight: bold;
+    }
+    .status {
+      margin-top: 10px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>Spell Right Pro</h1>
+  <div class="card">
+    <h2>Spell Right Pro</h2>
+    <p>Upload or enter words. Practice one word at a time.</p>
+    <input type="file" id="fileUpload" accept=".txt" /><br />
+    <textarea id="wordInput" rows="4" placeholder="Enter words, one per line..." style="width:100%; margin:10px 0;"></textarea><br />
+    <button onclick="addWords()">Start Practice</button>
 
-  <div id="loginSection">
-    <label>Email: <input type="email" id="userEmail" /></label>
-    <button onclick="loginUser()">🔐 Login</button>
-    <span id="loginStatus"></span>
-  </div>
-
-  <div id="accentSection">
-    <label>Accent:
-      <select id="accentSelect" onchange="changeAccent()">
-        <option value="en-GB">British</option>
-        <option value="en-US">American</option>
-        <option value="en-CA">Canadian</option>
-        <option value="en-AU">Australian</option>
-      </select>
-    </label>
-  </div>
-
-  <div id="trainer"></div>
-
-  <div id="uploadSection">
-    <h3>Add Words</h3>
-    <textarea id="wordInput" rows="4" placeholder="One word per line..."></textarea><br>
-    <button onclick="addCustomWords()">➕ Add Words</button>
-    <input type="file" id="fileUpload" accept=".txt" onchange="handleFileUpload(event)" />
-  </div>
-
-  <div id="saveControls">
-    <button onclick="saveWordList()">💾 Save List</button>
-    <button onclick="loadWordList()">📂 Load List</button>
-    <button onclick="clearWordList()">🗑 Clear</button>
+    <div id="trainer" style="display:none;">
+      <button onclick="speakWord()">🔊 Speak</button><br />
+      <input type="text" id="userInput" placeholder="Type what you heard" />
+      <br />
+      <button onclick="checkSpelling()">✔️ Check</button>
+      <div class="status" id="status"></div>
+      <button onclick="revealWord()">👁 Reveal</button>
+      <div class="hidden-word" id="hiddenWord"></div>
+      <br />
+      <button onclick="nextWord()">➡️ Next</button>
+    </div>
   </div>
 
   <script>
     let words = [];
-    let userEmail = "";
+    let index = 0;
     let currentAccent = 'en-GB';
 
-    const trainerDiv = document.getElementById("trainer");
-
-    function loginUser() {
-      userEmail = document.getElementById("userEmail").value.trim();
-      document.getElementById("loginStatus").textContent = userEmail ? `Logged in as ${userEmail}` : '';
+    function addWords() {
+      const inputText = document.getElementById("wordInput").value.trim();
+      const inputWords = inputText.split(/\n+/).map(w => w.trim()).filter(Boolean);
+      words = inputWords;
+      index = 0;
+      if (words.length > 0) {
+        document.getElementById("trainer").style.display = "block";
+        loadWord();
+      }
     }
 
-    function changeAccent() {
-      currentAccent = document.getElementById("accentSelect").value;
-    }
-
-    function speak(text) {
-      const utterance = new SpeechSynthesisUtterance(text);
+    function speakWord() {
+      if (!words[index]) return;
+      const utterance = new SpeechSynthesisUtterance(words[index]);
       utterance.lang = currentAccent;
       speechSynthesis.speak(utterance);
     }
 
-    function checkSpelling(input, correct, status) {
-      const typed = input.value.trim().toLowerCase();
-      const expected = correct.toLowerCase();
-      if (typed === expected) {
-        status.textContent = "✅ Correct";
+    function checkSpelling() {
+      const userInput = document.getElementById("userInput").value.trim().toLowerCase();
+      const correctWord = words[index].toLowerCase();
+      const status = document.getElementById("status");
+      if (userInput === correctWord) {
+        status.textContent = "✅ Correct!";
         status.style.color = "green";
       } else {
         status.textContent = "❌ Wrong";
@@ -115,100 +106,38 @@
       }
     }
 
-    function createBox(word, index) {
-      const box = document.createElement("div");
-      box.className = "word-box";
-
-      const title = document.createElement("div");
-      title.innerHTML = `<strong>Word ${index + 1}</strong>`;
-
-      const speakBtn = document.createElement("button");
-      speakBtn.textContent = "🔊 Speak";
-      speakBtn.onclick = () => speak(word);
-
-      const input = document.createElement("input");
-      input.type = "text";
-      input.placeholder = "Type what you heard...";
-
-      const checkBtn = document.createElement("button");
-      checkBtn.textContent = "✔️ Check";
-
-      const status = document.createElement("span");
-      status.className = "status";
-
-      checkBtn.onclick = () => checkSpelling(input, word, status);
-
-      const revealBtn = document.createElement("button");
-      revealBtn.textContent = "👁 Show";
-
-      const hidden = document.createElement("span");
-      hidden.textContent = " " + word;
-      hidden.className = "hidden-word";
-
-      revealBtn.onclick = () => hidden.style.display = "inline";
-
-      box.appendChild(title);
-      box.appendChild(speakBtn);
-      box.appendChild(input);
-      box.appendChild(checkBtn);
-      box.appendChild(status);
-      box.appendChild(document.createElement("br"));
-      box.appendChild(revealBtn);
-      box.appendChild(hidden);
-
-      trainerDiv.appendChild(box);
+    function revealWord() {
+      document.getElementById("hiddenWord").textContent = words[index];
+      document.getElementById("hiddenWord").style.display = "block";
     }
 
-    function renderWords() {
-      trainerDiv.innerHTML = "";
-      words.forEach((word, index) => createBox(word, index));
-    }
-
-    function addCustomWords() {
-      const input = document.getElementById("wordInput").value.trim();
-      if (!input) return;
-      const newWords = input.split(/\n+/).map(w => w.trim()).filter(Boolean);
-      words.push(...newWords);
-      renderWords();
-      document.getElementById("wordInput").value = "";
-    }
-
-    function handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const lines = e.target.result.split(/\r?\n/);
-        const newWords = lines.map(w => w.trim()).filter(Boolean);
-        words.push(...newWords);
-        renderWords();
-      };
-      reader.readAsText(file);
-    }
-
-    function saveWordList() {
-      if (!userEmail) return alert("Login with your email to save.");
-      localStorage.setItem("spellright-list-" + userEmail, JSON.stringify(words));
-      alert("Saved!");
-    }
-
-    function loadWordList() {
-      if (!userEmail) return alert("Login with your email to load.");
-      const saved = localStorage.getItem("spellright-list-" + userEmail);
-      if (saved) {
-        words = JSON.parse(saved);
-        renderWords();
-        alert("Loaded!");
+    function nextWord() {
+      index++;
+      if (index < words.length) {
+        loadWord();
       } else {
-        alert("No list found for this email.");
+        alert("You've completed the list!");
+        document.getElementById("trainer").style.display = "none";
       }
     }
 
-    function clearWordList() {
-      words = [];
-      renderWords();
+    function loadWord() {
+      document.getElementById("userInput").value = "";
+      document.getElementById("status").textContent = "";
+      document.getElementById("hiddenWord").textContent = "";
+      document.getElementById("hiddenWord").style.display = "none";
     }
+
+    document.getElementById("fileUpload").addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        document.getElementById("wordInput").value = evt.target.result;
+      };
+      reader.readAsText(file);
+    });
   </script>
 </body>
 </html>
