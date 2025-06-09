@@ -1,44 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Spell Right Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
       background-color: #f0f4f8;
     }
-    .word-box {
+    .section {
       margin-bottom: 20px;
-      padding: 15px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    button {
-      margin: 5px 5px 5px 0;
-    }
-    input[type="text"] {
-      padding: 5px;
-      width: 250px;
-    }
-    .status {
-      font-weight: bold;
-      margin-left: 10px;
-    }
-    .hidden-word {
-      font-family: monospace;
-      letter-spacing: 1px;
-      display: none;
-    }
-    #uploadSection, #saveControls, #loginSection, #accentSection {
-      margin-top: 30px;
       padding: 15px;
       background: #fff;
       border-radius: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    button {
+      margin: 5px;
     }
     textarea {
       width: 100%;
@@ -49,13 +29,13 @@
 <body>
   <h1>Spell Right Pro</h1>
 
-  <div id="loginSection">
-    <label>Email: <input type="email" id="userEmail" /></label>
+  <div class="section" id="loginSection">
+    <label>Email: <input type="email" id="userEmail"></label>
     <button onclick="loginUser()">🔐 Login</button>
     <span id="loginStatus"></span>
   </div>
 
-  <div id="accentSection">
+  <div class="section" id="accentSection">
     <label>Accent:
       <select id="accentSelect" onchange="changeAccent()">
         <option value="en-GB">British</option>
@@ -67,31 +47,26 @@
     <button onclick="speakAllWords()">▶️ Speak All</button>
   </div>
 
-  <div id="trainer"></div>
-
-  <div id="uploadSection">
+  <div class="section">
     <h3>Add Words</h3>
     <textarea id="wordInput" rows="4" placeholder="One word per line..."></textarea><br>
     <button onclick="addCustomWords()">➕ Add Words</button>
-    <input type="file" id="fileUpload" accept=".txt" onchange="handleFileUpload(event)" />
   </div>
 
-  <div id="saveControls">
-    <button onclick="saveWordList()">💾 Save List</button>
-    <button onclick="loadWordList()">📂 Load List</button>
-    <button onclick="clearWordList()">🗑 Clear</button>
-  </div>
+  <div id="trainer"></div>
 
   <script>
     let words = [];
     let userEmail = "";
-    let currentAccent = 'en-GB';
+    let currentAccent = "en-GB";
 
     const trainerDiv = document.getElementById("trainer");
 
     function loginUser() {
       userEmail = document.getElementById("userEmail").value.trim();
-      document.getElementById("loginStatus").textContent = userEmail ? `Logged in as ${userEmail}` : '';
+      document.getElementById("loginStatus").textContent = userEmail
+        ? `Logged in as ${userEmail}`
+        : '';
     }
 
     function changeAccent() {
@@ -105,139 +80,40 @@
     }
 
     function speakAllWords() {
-      if (speechSynthesis.speaking) {
-        alert("Please wait until the current speech finishes.");
-        return;
-      }
+      if (speechSynthesis.speaking) return;
 
       let i = 0;
-
-      function speakNext() {
-        if (i >= words.length) return;
-
-        const utterance = new SpeechSynthesisUtterance(words[i]);
-        utterance.lang = currentAccent;
-        utterance.rate = 0.8;
-        utterance.onend = () => {
-          i++;
-          speakNext();
-        };
-
-        speechSynthesis.speak(utterance);
+      function next() {
+        if (i < words.length) {
+          const utter = new SpeechSynthesisUtterance(words[i]);
+          utter.lang = currentAccent;
+          utter.onend = () => {
+            i++;
+            next();
+          };
+          speechSynthesis.speak(utter);
+        }
       }
-
-      if (words.length > 0) {
-        speakNext();
-      } else {
-        alert("No words to speak.");
-      }
-    }
-
-    function checkSpelling(input, correct, status) {
-      const typed = input.value.trim().toLowerCase();
-      const expected = correct.toLowerCase();
-      if (typed === expected) {
-        status.textContent = "✅ Correct";
-        status.style.color = "green";
-      } else {
-        status.textContent = "❌ Wrong";
-        status.style.color = "red";
-      }
-    }
-
-    function createBox(word, index) {
-      const box = document.createElement("div");
-      box.className = "word-box";
-
-      const title = document.createElement("div");
-      title.innerHTML = `<strong>Word ${index + 1}</strong>`;
-
-      const speakBtn = document.createElement("button");
-      speakBtn.textContent = "🔊 Speak";
-      speakBtn.onclick = () => speak(word);
-
-      const input = document.createElement("input");
-      input.type = "text";
-      input.placeholder = "Type what you heard...";
-
-      const checkBtn = document.createElement("button");
-      checkBtn.textContent = "✔️ Check";
-
-      const status = document.createElement("span");
-      status.className = "status";
-
-      checkBtn.onclick = () => checkSpelling(input, word, status);
-
-      const revealBtn = document.createElement("button");
-      revealBtn.textContent = "👁 Show";
-
-      const hidden = document.createElement("span");
-      hidden.textContent = " " + word;
-      hidden.className = "hidden-word";
-
-      revealBtn.onclick = () => hidden.style.display = "inline";
-
-      box.appendChild(title);
-      box.appendChild(speakBtn);
-      box.appendChild(input);
-      box.appendChild(checkBtn);
-      box.appendChild(status);
-      box.appendChild(document.createElement("br"));
-      box.appendChild(revealBtn);
-      box.appendChild(hidden);
-
-      trainerDiv.appendChild(box);
-    }
-
-    function renderWords() {
-      trainerDiv.innerHTML = "";
-      words.forEach((word, index) => createBox(word, index));
+      next();
     }
 
     function addCustomWords() {
-      const input = document.getElementById("wordInput").value.trim();
-      if (!input) return;
-      const newWords = input.split(/\n+/).map(w => w.trim()).filter(Boolean);
+      const text = document.getElementById("wordInput").value.trim();
+      if (!text) return;
+      const newWords = text.split(/\n+/).map(w => w.trim()).filter(Boolean);
       words.push(...newWords);
       renderWords();
-      document.getElementById("wordInput").value = "";
     }
 
-    function handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const lines = e.target.result.split(/\r?\n/);
-        const newWords = lines.map(w => w.trim()).filter(Boolean);
-        words.push(...newWords);
-        renderWords();
-      };
-      reader.readAsText(file);
-    }
-
-    function saveWordList() {
-      if (!userEmail) return alert("Login with your email to save.");
-      localStorage.setItem("spellright-list-" + userEmail, JSON.stringify(words));
-      alert("Saved!");
-    }
-
-    function loadWordList() {
-      if (!userEmail) return alert("Login with your email to load.");
-      const saved = localStorage.getItem("spellright-list-" + userEmail);
-      if (saved) {
-        words = JSON.parse(saved);
-        renderWords();
-        alert("Loaded!");
-      } else {
-        alert("No list found for this email.");
-      }
-    }
-
-    function clearWordList() {
-      words = [];
-      renderWords();
+    function renderWords() {
+      trainerDiv.innerHTML = '';
+      words.forEach((word, index) => {
+        const div = document.createElement("div");
+        div.className = "section";
+        div.innerHTML = `<strong>${index + 1}.</strong> ${word}
+          <button onclick="speak('${word}')">🔊</button>`;
+        trainerDiv.appendChild(div);
+      });
     }
   </script>
 </body>
