@@ -2,165 +2,204 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Spell Right Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spell Right Pro - Training</title>
+  <link rel="icon" href="logo.png" />
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f6f8;
-      padding: 20px;
-    }
-    .card {
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      max-width: 600px;
-      margin: auto;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f7fafc;
+      margin: 0;
+      padding: 0;
       text-align: center;
+      color: #333;
     }
-    input[type="text"] {
-      padding: 10px;
-      width: 80%;
-      margin: 10px auto;
-      font-size: 16px;
-    }
-    button {
-      padding: 10px 20px;
-      margin: 5px;
-      font-size: 16px;
-      border: none;
-      border-radius: 6px;
-      background-color: #007BFF;
+
+    header {
+      background-color: #0057b7;
       color: white;
+      padding: 30px 15px;
+    }
+
+    header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 1.2em;
+      margin: 0;
+    }
+
+    main {
+      padding: 40px 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .btn-primary {
+      background-color: #0057b7;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
       cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 20px;
     }
-    button:hover {
-      background-color: #0056b3;
+
+    .btn-primary:hover {
+      background-color: #0041a3;
     }
-    .hidden-word {
-      display: none;
-      margin-top: 10px;
+
+    footer {
+      background: #eee;
+      padding: 10px;
+      font-size: 0.9em;
+      margin-top: 40px;
+    }
+
+    img.logo {
+      width: 100px;
+      margin-bottom: 15px;
+    }
+
+    .training-area {
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-top: 30px;
+    }
+
+    #wordInput {
+      padding: 12px;
+      font-size: 1.2em;
+      width: 300px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+
+    #feedback {
+      font-size: 1.2em;
+      font-weight: bold;
+      min-height: 30px;
+      margin: 20px 0;
+    }
+
+    .correct {
+      color: green;
+    }
+
+    .incorrect {
+      color: red;
+    }
+
+    #progress {
+      margin: 20px 0;
       font-weight: bold;
     }
-    .status {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    .trainer-section button,
-    .trainer-section input,
-    .trainer-section .status,
-    .trainer-section .hidden-word {
+
+    #nextBtn {
       display: none;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>Spell Right Pro</h2>
-    <p>Upload or enter words. Practice one word at a time.</p>
-    <input type="file" id="fileUpload" accept=".txt" /><br />
-    <textarea id="wordInput" rows="4" placeholder="Enter words, one per line..." style="width:100%; margin:10px 0;"></textarea><br />
-    <button onclick="addWords()">Start Practice</button>
+  <header>
+    <img src="logo.png" alt="Spell Right Pro Logo" class="logo"/>
+    <h1>Spell Right Pro</h1>
+    <p>Your smart accent-based spelling trainer</p>
+  </header>
 
-    <div id="trainer" class="trainer-section">
-      <button id="speakBtn" onclick="speakWord()">🔊 Speak</button><br />
-      <input type="text" id="userInput" placeholder="Type what you heard" oninput="enableCheck()" disabled />
-      <br />
-      <button id="checkBtn" onclick="checkSpelling()" disabled>✔️ Check</button>
-      <div class="status" id="status"></div>
-      <button id="revealBtn" onclick="revealWord()" style="display:none;">👁 Reveal</button>
-      <div class="hidden-word" id="hiddenWord"></div>
-      <br />
-      <button id="nextBtn" onclick="nextWord()" disabled>➡️ Next</button>
+  <main>
+    <div class="training-area">
+      <h2>Spelling Training</h2>
+      <input type="file" id="wordFile" accept=".txt" />
+      <p>Upload a text file with one word per line</p>
+      
+      <div id="trainingControls" style="display: none;">
+        <div id="progress">Word 1 of 0</div>
+        <button id="speakBtn" class="btn-primary">Hear the Word</button>
+        <input type="text" id="wordInput" placeholder="Type the word you hear" />
+        <button id="checkBtn" class="btn-primary">Check Spelling</button>
+        <div id="feedback"></div>
+        <button id="nextBtn" class="btn-primary">Next Word</button>
+      </div>
     </div>
-  </div>
+  </main>
+
+  <footer>
+    &copy; 2025 Spell Right Pro. All rights reserved.
+  </footer>
 
   <script>
     let words = [];
-    let index = 0;
-    let currentAccent = 'en-GB';
+    let currentWordIndex = 0;
+    const synth = window.speechSynthesis;
 
-    function addWords() {
-      const inputText = document.getElementById("wordInput").value.trim();
-      const inputWords = inputText.split(/\n+/).map(w => w.trim()).filter(Boolean);
-      words = inputWords;
-      index = 0;
-      if (words.length > 0) {
-        document.getElementById("trainer").style.display = "block";
-        document.getElementById("speakBtn").style.display = "inline-block";
-        loadWord();
-      }
-    }
-
-    function speakWord() {
-      if (!words[index]) return;
-      const utterance = new SpeechSynthesisUtterance(words[index]);
-      utterance.lang = currentAccent;
-      utterance.onend = () => {
-        document.getElementById("userInput").disabled = false;
-        document.getElementById("checkBtn").disabled = false;
-      };
-      speechSynthesis.speak(utterance);
-    }
-
-    function enableCheck() {
-      document.getElementById("checkBtn").disabled = false;
-    }
-
-    function checkSpelling() {
-      const userInput = document.getElementById("userInput").value.trim().toLowerCase();
-      const correctWord = words[index].toLowerCase();
-      const status = document.getElementById("status");
-      if (userInput === correctWord) {
-        status.textContent = "✅ Correct!";
-        status.style.color = "green";
-      } else {
-        status.textContent = "❌ Wrong";
-        status.style.color = "red";
-        document.getElementById("revealBtn").style.display = "inline-block";
-      }
-      document.getElementById("nextBtn").disabled = false;
-      document.getElementById("checkBtn").disabled = true;
-      document.getElementById("userInput").disabled = true;
-    }
-
-    function revealWord() {
-      document.getElementById("hiddenWord").textContent = words[index];
-      document.getElementById("hiddenWord").style.display = "block";
-    }
-
-    function nextWord() {
-      index++;
-      if (index < words.length) {
-        loadWord();
-      } else {
-        alert("You've completed the list!");
-        document.getElementById("trainer").style.display = "none";
-      }
-    }
-
-    function loadWord() {
-      document.getElementById("userInput").value = "";
-      document.getElementById("userInput").disabled = true;
-      document.getElementById("checkBtn").disabled = true;
-      document.getElementById("nextBtn").disabled = true;
-      document.getElementById("status").textContent = "";
-      document.getElementById("hiddenWord").textContent = "";
-      document.getElementById("hiddenWord").style.display = "none";
-      document.getElementById("revealBtn").style.display = "none";
-    }
-
-    document.getElementById("fileUpload").addEventListener("change", function(e) {
+    document.getElementById('wordFile').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = function(evt) {
-        document.getElementById("wordInput").value = evt.target.result;
+      reader.onload = function(e) {
+        const content = e.target.result;
+        words = content.split('\n').filter(word => word.trim() !== '');
+        if (words.length > 0) {
+          document.getElementById('trainingControls').style.display = 'block';
+          updateProgress();
+        } else {
+          alert('The file is empty or contains no valid words.');
+        }
       };
       reader.readAsText(file);
     });
+
+    document.getElementById('speakBtn').addEventListener('click', function() {
+      if (words.length === 0) return;
+      
+      const utterance = new SpeechSynthesisUtterance(words[currentWordIndex]);
+      utterance.rate = 0.8;
+      synth.speak(utterance);
+    });
+
+    document.getElementById('checkBtn').addEventListener('click', function() {
+      if (words.length === 0) return;
+      
+      const userInput = document.getElementById('wordInput').value.trim();
+      const correctWord = words[currentWordIndex].trim();
+      const feedback = document.getElementById('feedback');
+      
+      if (userInput.toLowerCase() === correctWord.toLowerCase()) {
+        feedback.textContent = "Correct! Well done!";
+        feedback.className = "correct";
+        document.getElementById('nextBtn').style.display = 'inline-block';
+      } else {
+        feedback.textContent = `Incorrect. The correct spelling is: ${correctWord}`;
+        feedback.className = "incorrect";
+      }
+    });
+
+    document.getElementById('nextBtn').addEventListener('click', function() {
+      currentWordIndex++;
+      if (currentWordIndex >= words.length) {
+        currentWordIndex = 0;
+      }
+      
+      document.getElementById('wordInput').value = '';
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('nextBtn').style.display = 'none';
+      updateProgress();
+    });
+
+    function updateProgress() {
+      document.getElementById('progress').textContent = 
+        `Word ${currentWordIndex + 1} of ${words.length}`;
+    }
   </script>
 </body>
 </html>
