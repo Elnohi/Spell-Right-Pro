@@ -170,7 +170,7 @@
       const separators = /[\n,\/]+|\s{2,}/g;
       const newWords = input.split(separators).map(w => w.trim()).filter(Boolean);
       words.push(...newWords);
-      renderWords();
+      renderWords();document.getElementById("wordInput").value = newWords.join('\n');
       document.getElementById("wordInput").value = "";
 
       // Speak all new words one by one
