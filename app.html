@@ -1,4 +1,4 @@
-[⚠️ Suspicious Content] <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -47,6 +47,12 @@
       margin-top: 10px;
       font-weight: bold;
     }
+    .trainer-section button,
+    .trainer-section input,
+    .trainer-section .status,
+    .trainer-section .hidden-word {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -57,16 +63,16 @@
     <textarea id="wordInput" rows="4" placeholder="Enter words, one per line..." style="width:100%; margin:10px 0;"></textarea><br />
     <button onclick="addWords()">Start Practice</button>
 
-    <div id="trainer" style="display:none;">
-      <button onclick="speakWord()">🔊 Speak</button><br />
-      <input type="text" id="userInput" placeholder="Type what you heard" />
+    <div id="trainer" class="trainer-section">
+      <button id="speakBtn" onclick="speakWord()">🔊 Speak</button><br />
+      <input type="text" id="userInput" placeholder="Type what you heard" oninput="enableCheck()" disabled />
       <br />
-      <button onclick="checkSpelling()">✔️ Check</button>
+      <button id="checkBtn" onclick="checkSpelling()" disabled>✔️ Check</button>
       <div class="status" id="status"></div>
-      <button onclick="revealWord()">👁 Reveal</button>
+      <button id="revealBtn" onclick="revealWord()" style="display:none;">👁 Reveal</button>
       <div class="hidden-word" id="hiddenWord"></div>
       <br />
-      <button onclick="nextWord()">➡️ Next</button>
+      <button id="nextBtn" onclick="nextWord()" disabled>➡️ Next</button>
     </div>
   </div>
 
@@ -82,6 +88,7 @@
       index = 0;
       if (words.length > 0) {
         document.getElementById("trainer").style.display = "block";
+        document.getElementById("speakBtn").style.display = "inline-block";
         loadWord();
       }
     }
@@ -90,7 +97,15 @@
       if (!words[index]) return;
       const utterance = new SpeechSynthesisUtterance(words[index]);
       utterance.lang = currentAccent;
+      utterance.onend = () => {
+        document.getElementById("userInput").disabled = false;
+        document.getElementById("checkBtn").disabled = false;
+      };
       speechSynthesis.speak(utterance);
+    }
+
+    function enableCheck() {
+      document.getElementById("checkBtn").disabled = false;
     }
 
     function checkSpelling() {
@@ -103,7 +118,11 @@
       } else {
         status.textContent = "❌ Wrong";
         status.style.color = "red";
+        document.getElementById("revealBtn").style.display = "inline-block";
       }
+      document.getElementById("nextBtn").disabled = false;
+      document.getElementById("checkBtn").disabled = true;
+      document.getElementById("userInput").disabled = true;
     }
 
     function revealWord() {
@@ -123,9 +142,13 @@
 
     function loadWord() {
       document.getElementById("userInput").value = "";
+      document.getElementById("userInput").disabled = true;
+      document.getElementById("checkBtn").disabled = true;
+      document.getElementById("nextBtn").disabled = true;
       document.getElementById("status").textContent = "";
       document.getElementById("hiddenWord").textContent = "";
       document.getElementById("hiddenWord").style.display = "none";
+      document.getElementById("revealBtn").style.display = "none";
     }
 
     document.getElementById("fileUpload").addEventListener("change", function(e) {
