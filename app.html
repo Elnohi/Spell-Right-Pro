@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Spell Right Pro</title>
   <style>
     body {
@@ -19,10 +19,13 @@
     }
     button {
       margin-right: 10px;
+      padding: 6px 12px;
+      font-size: 14px;
     }
     input[type="text"] {
-      padding: 5px;
-      width: 200px;
+      padding: 6px;
+      width: 250px;
+      font-size: 16px;
     }
     .hidden-word {
       font-family: monospace;
@@ -32,162 +35,106 @@
       font-weight: bold;
       margin-left: 10px;
     }
-    #uploadSection, #loginSection, #accentSection, #saveControls {
-      margin-top: 30px;
-      padding: 15px;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    #logo {
-      height: 50px;
-      margin-bottom: 20px;
+    #accentSelect {
+      margin: 10px 0;
     }
   </style>
 </head>
 <body>
-  <img id="logo" src="logo.png" alt="Spell Right Pro Logo">
-  <h1>Spell Right Pro</h1>
-  <p>Click "Speak" to hear the word. Type what you hear. Reveal and check the correct spelling. You can add, save, or load word lists.</p>
-
-  <div id="loginSection">
-    <label>Email: <input type="email" id="userEmail" /></label>
-    <button onclick="loginUser()">🔐 Login</button>
-    <span id="loginStatus"></span>
-  </div>
-
-  <div id="accentSection">
-    <label for="accentSelect">Choose Accent: </label>
-    <select id="accentSelect" onchange="changeAccent()">
-      <option value="en-GB">British</option>
-      <option value="en-US">American</option>
-      <option value="en-CA">Canadian</option>
-      <option value="en-AU">Australian</option>
-    </select>
-  </div>
+  <h1>🔤 Spell Right Pro</h1>
+  <label for="accentSelect">Choose Accent:</label>
+  <select id="accentSelect" onchange="changeAccent()">
+    <option value="en-GB">British</option>
+    <option value="en-US">American</option>
+    <option value="en-CA">Canadian</option>
+    <option value="en-AU">Australian</option>
+  </select>
 
   <div id="trainer"></div>
 
-  <div id="uploadSection">
-    <h2>Add Your Own Words</h2>
-    <textarea id="wordInput" rows="4" style="width:100%;" placeholder="Paste words here, one per line..."></textarea><br>
-    <button onclick="addCustomWords()">➕ Add Words</button>
-    <input type="file" id="fileUpload" accept=".txt,.doc,.docx,.pdf" onchange="handleFileUpload(event)" />
-  </div>
-
-  <div id="saveControls">
-    <button onclick="saveWordList()">💾 Save List</button>
-    <button onclick="loadWordList()">📂 Load List</button>
-    <button onclick="clearWordList()">🗑 Clear All</button>
-  </div>
-
   <script>
-    let words = [];
-    let userEmail = "";
     let currentAccent = 'en-GB';
-
     const trainerDiv = document.getElementById("trainer");
 
-    function loginUser() {
-      userEmail = document.getElementById("userEmail").value.trim();
-      document.getElementById("loginStatus").textContent = userEmail ? `Logged in as ${userEmail}` : '';
-    }
+    const wordList = [
+      "Nausea", "Vitamin B12", "Angina", "Chills", "Shivering",
+      "Bloating", "Groin", "Confidence", "Antisocial", "Cloudy",
+      "Full blood count", "Gastric bypass", "Confusion", "Fingertips",
+      "Swallowing", "Indigestion", "Spotting", "Painkillers", "Lethargic",
+      "Cold compress", "Ribcage", "Drained", "Itching", "Above normal"
+    ];
 
     function changeAccent() {
       currentAccent = document.getElementById("accentSelect").value;
     }
 
-    function createBox(word, index) {
-      const box = document.createElement("div");
-      box.className = "word-box";
-      box.innerHTML = `
-        <strong>Word ${index + 1}</strong><br>
-        <button onclick="speak('${word}')">🔊 Speak</button>
-        <input type="text" placeholder="Type your spelling here" />
-        <button onclick="checkSpelling(this, '${word}')">✔️ Check</button>
-        <span class="status"></span>
-        <br><button onclick="this.nextElementSibling.style.display='inline'">👁 Show</button>
-        <span class="hidden-word" style="display:none;"> ${word} </span>
-      `;
-      trainerDiv.appendChild(box);
-    }
-
-    function initWords() {
-      trainerDiv.innerHTML = "";
-      words.forEach((word, index) => createBox(word, index));
-    }
-
     function speak(text) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = currentAccent;
-      utterance.rate = 0.9;
-      speechSynthesis.cancel();
       speechSynthesis.speak(utterance);
     }
 
-    function checkSpelling(btn, correct) {
-      const input = btn.previousElementSibling;
-      const status = btn.nextElementSibling;
-      if (input.value.trim().toLowerCase() === correct.toLowerCase()) {
-        status.textContent = "✅ Correct";
-        status.style.color = "green";
+    function checkSpelling(input, correctWord, statusSpan) {
+      const typed = input.value.trim().toLowerCase();
+      const expected = correctWord.trim().toLowerCase();
+      if (typed === expected) {
+        statusSpan.textContent = "✅ Correct";
+        statusSpan.style.color = "green";
       } else {
-        status.textContent = "❌ Wrong";
-        status.style.color = "red";
+        statusSpan.textContent = "❌ Wrong";
+        statusSpan.style.color = "red";
       }
     }
 
-    function addCustomWords() {
-      const newWords = document.getElementById("wordInput").value.trim().split(/\n+/);
-      newWords.forEach(w => {
-        if (w) words.push(w);
-      });
-      initWords();
+    function createWordBox(word, index) {
+      const box = document.createElement("div");
+      box.className = "word-box";
+
+      const speakBtn = document.createElement("button");
+      speakBtn.textContent = "🔊 Speak";
+      speakBtn.onclick = () => speak(word);
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "Type what you heard...";
+
+      const checkBtn = document.createElement("button");
+      checkBtn.textContent = "✔️ Check";
+
+      const status = document.createElement("span");
+      status.className = "status";
+
+      checkBtn.onclick = () => checkSpelling(input, word, status);
+
+      const revealBtn = document.createElement("button");
+      revealBtn.textContent = "👁 Show";
+
+      const hiddenWord = document.createElement("span");
+      hiddenWord.textContent = " " + word;
+      hiddenWord.className = "hidden-word";
+      hiddenWord.style.display = "none";
+
+      revealBtn.onclick = () => hiddenWord.style.display = "inline";
+
+      box.appendChild(document.createTextNode(`Word ${index + 1}`));
+      box.appendChild(document.createElement("br"));
+      box.appendChild(speakBtn);
+      box.appendChild(input);
+      box.appendChild(checkBtn);
+      box.appendChild(status);
+      box.appendChild(document.createElement("br"));
+      box.appendChild(revealBtn);
+      box.appendChild(hiddenWord);
+
+      trainerDiv.appendChild(box);
     }
 
-    function handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const content = e.target.result;
-        const newWords = content.split(/\n|\r/).map(line => line.trim()).filter(Boolean);
-        newWords.forEach(w => words.push(w));
-        initWords();
-      };
-
-      if (file.type.includes("text") || file.name.endsWith(".txt")) {
-        reader.readAsText(file);
-      } else {
-        alert("Only .txt, .docx, and .pdf files are partially supported. Use .txt for best results.");
-      }
+    function init() {
+      trainerDiv.innerHTML = "";
+      wordList.forEach((word, index) => createWordBox(word, index));
     }
 
-    function saveWordList() {
-      if (!userEmail) return alert("Login with your email to save.");
-      localStorage.setItem("spellingList-" + userEmail, JSON.stringify(words));
-      alert("Word list saved.");
-    }
-
-    function loadWordList() {
-      if (!userEmail) return alert("Login with your email to load saved list.");
-      const saved = localStorage.getItem("spellingList-" + userEmail);
-      if (saved) {
-        words = JSON.parse(saved);
-        initWords();
-        alert("Word list loaded.");
-      } else {
-        alert("No saved list found.");
-      }
-    }
-
-    function clearWordList() {
-      words = [];
-      initWords();
-    }
-
-    initWords();
+    init();
   </script>
 </body>
 </html>
