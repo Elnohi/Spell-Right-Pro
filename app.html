@@ -28,12 +28,7 @@
       font-weight: bold;
       margin-left: 10px;
     }
-    .hidden-word {
-      font-family: monospace;
-      letter-spacing: 1px;
-      display: none;
-    }
-    #uploadSection, #saveControls, #loginSection, #accentSection {
+    #uploadSection, #saveControls, #loginSection, #accentSection, #examSection {
       margin-top: 30px;
       padding: 15px;
       background: #fff;
@@ -70,13 +65,24 @@
     </label>
   </div>
 
+  <div id="examSection">
+    <label>Select Exam:
+      <select id="examSelect" onchange="suggestWords()">
+        <option value="">-- None --</option>
+        <option value="OET">OET</option>
+        <option value="IELTS">IELTS</option>
+        <option value="TOEFL">TOEFL</option>
+      </select>
+    </label>
+  </div>
+
   <div id="trainer"></div>
 
   <div id="uploadSection">
     <h3>Add Words</h3>
     <textarea id="wordInput" rows="4" placeholder="Enter words or phrases separated by commas, slashes, dashes, or line breaks..."></textarea>
     <label class="checkbox-label">
-      <input type="checkbox" id="phraseToggle" /> Read as phrases (e.g. "deep vein thrombosis")
+      <input type="checkbox" id="phraseToggle" /> Read as phrases
     </label>
     <button onclick="addCustomWords()">➕ Add Words</button>
     <input type="file" id="fileUpload" accept=".txt" onchange="handleFileUpload(event)" />
@@ -88,13 +94,23 @@
     <button onclick="clearWordList()">🗑 Clear</button>
   </div>
 
+  <div id="scoreDisplay" style="margin-top:20px; font-weight:bold;"></div>
+
   <script>
     let words = [];
     let userEmail = "";
     let currentAccent = 'en-GB';
     let currentWordIndex = 0;
+    let correctCount = 0;
 
     const trainerDiv = document.getElementById("trainer");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+
+    const examWordLists = {
+      OET: ['nausea', 'indigestion', 'osteoporosis', 'atrial fibrillation', 'deep vein thrombosis'],
+      IELTS: ['confidence', 'lethargic', 'philosophy', 'resilience', 'environment'],
+      TOEFL: ['academic', 'theory', 'hypothesis', 'phenomenon', 'research']
+    };
 
     function loginUser() {
       userEmail = document.getElementById("userEmail").value.trim();
@@ -111,26 +127,24 @@
       speechSynthesis.speak(utterance);
     }
 
-    function checkSpelling(input, correct, status, nextButton) {
-      const typed = input.value.trim().toLowerCase();
-      const expected = correct.toLowerCase();
-      if (typed === expected) {
-        status.textContent = "✅ Correct";
-        status.style.color = "green";
-        nextButton.disabled = false;
-      } else {
-        status.textContent = "❌ Wrong";
-        status.style.color = "red";
-      }
+    function startTrainer() {
+      trainerDiv.innerHTML = '';
+      if (words.length === 0) return;
+      currentWordIndex = 0;
+      correctCount = 0;
+      scoreDisplay.textContent = '';
+      presentWord();
     }
 
-    function createBox(word, index) {
+    function presentWord() {
+      trainerDiv.innerHTML = '';
+      const word = words[currentWordIndex];
+
       const box = document.createElement("div");
       box.className = "word-box";
-      box.style.display = index === 0 ? "block" : "none";
 
       const title = document.createElement("div");
-      title.innerHTML = `<strong>Word ${index + 1}</strong>`;
+      title.innerHTML = `<strong>Word ${currentWordIndex + 1} of ${words.length}</strong>`;
 
       const speakBtn = document.createElement("button");
       speakBtn.textContent = "🔊 Speak";
@@ -146,35 +160,41 @@
       const status = document.createElement("span");
       status.className = "status";
 
-      const nextBtn = document.createElement("button");
-      nextBtn.textContent = "➡️ Next";
-      nextBtn.disabled = true;
-      nextBtn.onclick = () => {
-        box.style.display = "none";
-        if (index + 1 < words.length) {
-          document.getElementById(`word-box-${index + 1}`).style.display = "block";
-          speak(words[index + 1]);
+      checkBtn.onclick = () => {
+        const typed = input.value.trim().toLowerCase();
+        const expected = word.toLowerCase();
+
+        if (typed === expected) {
+          status.textContent = "✅ Correct";
+          status.style.color = "green";
+          correctCount++;
+        } else {
+          status.textContent = `❌ Wrong. Correct: ${word}`;
+          status.style.color = "red";
         }
+
+        setTimeout(() => {
+          currentWordIndex++;
+          if (currentWordIndex < words.length) {
+            presentWord();
+          } else {
+            showScore();
+          }
+        }, 1500);
       };
 
-      checkBtn.onclick = () => checkSpelling(input, word, status, nextBtn);
-
-      box.id = `word-box-${index}`;
       box.appendChild(title);
       box.appendChild(speakBtn);
       box.appendChild(input);
       box.appendChild(checkBtn);
       box.appendChild(status);
-      box.appendChild(document.createElement("br"));
-      box.appendChild(nextBtn);
 
       trainerDiv.appendChild(box);
+      speak(word);
     }
 
-    function renderWords() {
-      trainerDiv.innerHTML = "";
-      words.forEach((word, index) => createBox(word, index));
-      if (words.length > 0) speak(words[0]);
+    function showScore() {
+      scoreDisplay.textContent = `You got ${correctCount} out of ${words.length} correct!`;
     }
 
     function addCustomWords() {
@@ -184,7 +204,7 @@
 
       let newWords = [];
       if (asPhrases) {
-        newWords = input.split(/\n|,|\/|-/).map(w => w.trim()).filter(Boolean);
+        newWords = input.split(/[\n,\/\-]+/).map(w => w.trim()).filter(Boolean);
       } else {
         newWords = input
           .split(/[\n,\/\-]+|\s{2,}/g)
@@ -193,8 +213,8 @@
       }
 
       words = newWords;
-      renderWords();
       document.getElementById("wordInput").value = "";
+      startTrainer();
     }
 
     function handleFileUpload(event) {
@@ -208,7 +228,7 @@
         let newWords = [];
 
         if (asPhrases) {
-          newWords = content.split(/\n|,|\/|-/).map(w => w.trim()).filter(Boolean);
+          newWords = content.split(/[\n,\/\-]+/).map(w => w.trim()).filter(Boolean);
         } else {
           newWords = content
             .split(/[\n,\/\-]+|\s{2,}/g)
@@ -217,9 +237,17 @@
         }
 
         words = newWords;
-        renderWords();
+        startTrainer();
       };
       reader.readAsText(file);
+    }
+
+    function suggestWords() {
+      const exam = document.getElementById('examSelect').value;
+      if (exam && examWordLists[exam]) {
+        words = examWordLists[exam];
+        startTrainer();
+      }
     }
 
     function saveWordList() {
@@ -233,7 +261,7 @@
       const saved = localStorage.getItem("spellright-list-" + userEmail);
       if (saved) {
         words = JSON.parse(saved);
-        renderWords();
+        startTrainer();
         alert("Loaded!");
       } else {
         alert("No list found for this email.");
@@ -242,7 +270,8 @@
 
     function clearWordList() {
       words = [];
-      trainerDiv.innerHTML = "";
+      trainerDiv.innerHTML = '';
+      scoreDisplay.textContent = '';
     }
   </script>
 </body>
