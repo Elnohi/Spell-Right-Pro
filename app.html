@@ -92,6 +92,7 @@
     let words = [];
     let userEmail = "";
     let currentAccent = 'en-GB';
+    let currentWordIndex = 0;
 
     const trainerDiv = document.getElementById("trainer");
 
@@ -110,12 +111,13 @@
       speechSynthesis.speak(utterance);
     }
 
-    function checkSpelling(input, correct, status) {
+    function checkSpelling(input, correct, status, nextButton) {
       const typed = input.value.trim().toLowerCase();
       const expected = correct.toLowerCase();
       if (typed === expected) {
         status.textContent = "✅ Correct";
         status.style.color = "green";
+        nextButton.disabled = false;
       } else {
         status.textContent = "❌ Wrong";
         status.style.color = "red";
@@ -125,6 +127,7 @@
     function createBox(word, index) {
       const box = document.createElement("div");
       box.className = "word-box";
+      box.style.display = index === 0 ? "block" : "none";
 
       const title = document.createElement("div");
       title.innerHTML = `<strong>Word ${index + 1}</strong>`;
@@ -143,25 +146,27 @@
       const status = document.createElement("span");
       status.className = "status";
 
-      checkBtn.onclick = () => checkSpelling(input, word, status);
+      const nextBtn = document.createElement("button");
+      nextBtn.textContent = "➡️ Next";
+      nextBtn.disabled = true;
+      nextBtn.onclick = () => {
+        box.style.display = "none";
+        if (index + 1 < words.length) {
+          document.getElementById(`word-box-${index + 1}`).style.display = "block";
+          speak(words[index + 1]);
+        }
+      };
 
-      const revealBtn = document.createElement("button");
-      revealBtn.textContent = "👁 Show";
+      checkBtn.onclick = () => checkSpelling(input, word, status, nextBtn);
 
-      const hidden = document.createElement("span");
-      hidden.textContent = " " + word;
-      hidden.className = "hidden-word";
-
-      revealBtn.onclick = () => hidden.style.display = "inline";
-
+      box.id = `word-box-${index}`;
       box.appendChild(title);
       box.appendChild(speakBtn);
       box.appendChild(input);
       box.appendChild(checkBtn);
       box.appendChild(status);
       box.appendChild(document.createElement("br"));
-      box.appendChild(revealBtn);
-      box.appendChild(hidden);
+      box.appendChild(nextBtn);
 
       trainerDiv.appendChild(box);
     }
@@ -169,33 +174,27 @@
     function renderWords() {
       trainerDiv.innerHTML = "";
       words.forEach((word, index) => createBox(word, index));
+      if (words.length > 0) speak(words[0]);
     }
 
     function addCustomWords() {
       const input = document.getElementById("wordInput").value.trim();
       const asPhrases = document.getElementById("phraseToggle").checked;
-
       if (!input) return;
 
       let newWords = [];
       if (asPhrases) {
-        // Treat each phrase split by common delimiters as a single unit
-        newWords = input.split(/[\n,\/\-]+/).map(w => w.trim()).filter(Boolean);
+        newWords = input.split(/\n|,|\/|-/).map(w => w.trim()).filter(Boolean);
       } else {
-        // Split into individual words
         newWords = input
           .split(/[\n,\/\-]+|\s{2,}/g)
           .flatMap(phrase => phrase.trim().split(/\s+/))
           .filter(Boolean);
       }
 
-      words.push(...newWords);
+      words = newWords;
       renderWords();
       document.getElementById("wordInput").value = "";
-
-      newWords.forEach((word, i) => {
-        setTimeout(() => speak(word), i * 1000);
-      });
     }
 
     function handleFileUpload(event) {
@@ -209,7 +208,7 @@
         let newWords = [];
 
         if (asPhrases) {
-          newWords = content.split(/[\n,\/\-]+/).map(w => w.trim()).filter(Boolean);
+          newWords = content.split(/\n|,|\/|-/).map(w => w.trim()).filter(Boolean);
         } else {
           newWords = content
             .split(/[\n,\/\-]+|\s{2,}/g)
@@ -217,11 +216,8 @@
             .filter(Boolean);
         }
 
-        words.push(...newWords);
+        words = newWords;
         renderWords();
-        newWords.forEach((word, i) => {
-          setTimeout(() => speak(word), i * 1000);
-        });
       };
       reader.readAsText(file);
     }
@@ -246,7 +242,7 @@
 
     function clearWordList() {
       words = [];
-      renderWords();
+      trainerDiv.innerHTML = "";
     }
   </script>
 </body>
