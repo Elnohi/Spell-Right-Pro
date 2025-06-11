@@ -7,6 +7,7 @@
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; }
         select, button, input { margin: 10px 0; padding: 8px; font-size: 16px; }
+        .hidden { display: none; }
         .result { margin-top: 20px; font-size: 18px; }
     </style>
 </head>
@@ -15,15 +16,19 @@
     <h1>Spell Right Pro</h1>
 
     <label for="examType">Select Exam Type:</label>
-    <select id="examType">
-        <option value="none">None</option>
+    <select id="examType" onchange="handleExamSelection()">
+        <option value="none">None (Upload your own list)</option>
         <option value="oet">OET</option>
         <option value="ielts">IELTS</option>
     </select>
 
-    <button onclick="startTraining()">Start Training</button>
+    <div id="uploadSection" class="hidden">
+        <h3>Upload Your Word List (One word per line)</h3>
+        <textarea id="customWordList" rows="10" cols="30" placeholder="Type or paste your word list here..."></textarea><br>
+        <button onclick="loadCustomList()">Start Training</button>
+    </div>
 
-    <div id="trainingArea" style="display:none;">
+    <div id="trainingSection" class="hidden">
         <p id="wordPrompt"></p>
         <input type="text" id="userInput" placeholder="Type the spelling here" />
         <button onclick="checkSpelling()">Submit</button>
@@ -72,24 +77,41 @@
         let currentIndex = 0;
         let correctCount = 0;
 
-        function startTraining() {
+        function handleExamSelection() {
             const examType = document.getElementById('examType').value;
 
-            if (examType === 'none') {
-                selectedWords = [];
-            } else {
-                selectedWords = wordLists[examType] || [];
-            }
+            document.getElementById('trainingSection').classList.add('hidden');
+            document.getElementById('scoreArea').innerHTML = '';
+            document.getElementById('result').innerHTML = '';
 
-            if (selectedWords.length === 0) {
-                alert('No words to train on. Please select an exam type with a word list.');
+            if (examType === 'none') {
+                document.getElementById('uploadSection').classList.remove('hidden');
+            } else {
+                document.getElementById('uploadSection').classList.add('hidden');
+                selectedWords = wordLists[examType] || [];
+                startTraining();
+            }
+        }
+
+        function loadCustomList() {
+            const inputText = document.getElementById('customWordList').value.trim();
+            if (inputText === '') {
+                alert('Please enter some words.');
                 return;
             }
+            selectedWords = inputText.split('\n').map(word => word.trim()).filter(word => word !== '');
+            if (selectedWords.length === 0) {
+                alert('Your list is empty.');
+                return;
+            }
+            startTraining();
+        }
 
+        function startTraining() {
             currentIndex = 0;
             correctCount = 0;
 
-            document.getElementById('trainingArea').style.display = 'block';
+            document.getElementById('trainingSection').classList.remove('hidden');
             document.getElementById('scoreArea').innerHTML = '';
             document.getElementById('result').innerHTML = '';
             showNextWord();
