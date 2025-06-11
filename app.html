@@ -97,7 +97,28 @@
   <div id="scoreDisplay" style="margin-top:20px; font-weight:bold;"></div>
 
   <script>
-    let words = [];
+    // Full OET word list (preloaded)
+    let words = [
+      "Asking", "Nausea", "Indigestion", "Full blood count", "Cloudy", "Cold compress", "Lethargic", "Confidence", "Popping", "Clicking", "Heel",
+      "Osteoarthritis", "Deep vein thrombosis", "Atrial fibrillation", "Swollen", "Yoga", "Aerobic exercises", "Physiotherapy session", "Calf",
+      "Calves", "Crutches", "Translator", "Mouth ulcers", "Infection", "Compartment syndrome", "Painkillers", "Antisocial", "Chills",
+      "Fingertips", "B12 deficiency", "Angina", "Rib cage", "Swallowing", "Drained", "Confusion", "Shivering", "Stinging", "Bloating",
+      "Tonsillectomy", "Potassium level", "Overactive thyroid", "Gymnastics", "Anaemia", "Indoor exercises", "Tongue-tie", "Crusty mucus",
+      "Dyspepsia", "Crowded places", "White crusts", "Antihistamine", "Breathless", "Infertile", "Night sweats", "Sticky", "Strangulation",
+      "Lying flat", "Surveyor", "Clockwise", "Left calf", "Punctured lung", "Social gatherings", "Tinnitus", "Vomited", "Injection",
+      "Hearing loss", "Stomach", "Groin", "Gastric bypass", "Confidence", "Concentration", "Fluid retention", "Wheeze", "Murmur",
+      "Endoscopy", "Physiotherapist", "Breathing difficulty", "Heart failure", "Stroke", "Seizures", "Fracture", "Abdominal pain",
+      "Urinary retention", "Chest infection", "Asthma", "Hypertension", "Diabetes", "Thyroid problem", "Kidney disease", "Liver disease",
+      "Gallstones", "Coughing blood", "Blood in urine", "Swelling in legs", "Palpitations", "Syncope", "Sudden weight loss", "Sudden weight gain",
+      "Dizziness", "Vertigo", "Fatigue", "Loss of appetite", "Vomiting blood", "Dark stools", "Difficulty swallowing", "Persistent cough",
+      "Fever", "Night chills", "Weight loss", "Pain during urination", "Shortness of breath", "Wheezing", "Joint pain", "Back pain",
+      "Neck pain", "Shoulder pain", "Hip pain", "Knee pain", "Ankle pain", "Foot pain", "Hand pain", "Elbow pain", "Wrist pain",
+      "Chest pain", "Lower abdominal pain", "Upper abdominal pain", "Diarrhoea", "Constipation", "Bloating", "Heartburn", "Nausea and vomiting",
+      "Jaundice", "Frequent urination", "Urgency", "Incontinence", "Painful urination", "Blood in stool", "Change in bowel habits", "Skin rash",
+      "Itching", "Bruising", "Bleeding", "Numbness", "Tingling", "Muscle weakness", "Memory loss", "Speech difficulties", "Vision problems",
+      "Hearing problems", "Balance problems", "Depression", "Anxiety", "Sleep disturbances"
+    ];
+
     let userEmail = "";
     let currentAccent = 'en-GB';
     let currentWordIndex = 0;
@@ -107,10 +128,14 @@
     const scoreDisplay = document.getElementById("scoreDisplay");
 
     const examWordLists = {
-      OET: ['nausea', 'indigestion', 'osteoporosis', 'atrial fibrillation', 'deep vein thrombosis'],
+      OET: words,
       IELTS: ['confidence', 'lethargic', 'philosophy', 'resilience', 'environment'],
       TOEFL: ['academic', 'theory', 'hypothesis', 'phenomenon', 'research']
     };
+
+    window.onload = function() {
+      startTrainer();
+    }
 
     function loginUser() {
       userEmail = document.getElementById("userEmail").value.trim();
