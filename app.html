@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Spell Right Pro</title>
   <style>
     body {
@@ -19,10 +19,13 @@
     }
     button {
       margin: 5px 5px 5px 0;
+      padding: 8px 12px;
+      cursor: pointer;
     }
     input[type="text"], input[type="email"] {
-      padding: 5px;
+      padding: 8px;
       width: 250px;
+      margin-right: 10px;
     }
     .status {
       font-weight: bold;
@@ -38,10 +41,35 @@
     textarea {
       width: 100%;
       margin-top: 10px;
+      padding: 8px;
+      min-height: 100px;
     }
     label.checkbox-label {
       display: block;
       margin: 10px 0;
+    }
+    /* New styles */
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .flagged {
+      background-color: #fff3cd !important;
+    }
+    .review-section {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8d7da;
+      border-radius: 10px;
+    }
+    .review-item {
+      margin: 5px 0;
+      padding: 5px;
+    }
+    select {
+      padding: 8px;
+      margin-left: 5px;
     }
   </style>
 </head>
@@ -67,7 +95,7 @@
 
   <div id="examSection">
     <label>Select Exam:
-      <select id="examSelect" onchange="suggestWords()">
+      <select id="examSelect" onchange="loadExamWords()">
         <option value="">-- None --</option>
         <option value="OET">OET</option>
         <option value="IELTS">IELTS</option>
@@ -97,44 +125,76 @@
   <div id="scoreDisplay" style="margin-top:20px; font-weight:bold;"></div>
 
   <script>
-    // Full OET word list (preloaded)
-    let words = [
-      "Asking", "Nausea", "Indigestion", "Full blood count", "Cloudy", "Cold compress", "Lethargic", "Confidence", "Popping", "Clicking", "Heel",
-      "Osteoarthritis", "Deep vein thrombosis", "Atrial fibrillation", "Swollen", "Yoga", "Aerobic exercises", "Physiotherapy session", "Calf",
-      "Calves", "Crutches", "Translator", "Mouth ulcers", "Infection", "Compartment syndrome", "Painkillers", "Antisocial", "Chills",
-      "Fingertips", "B12 deficiency", "Angina", "Rib cage", "Swallowing", "Drained", "Confusion", "Shivering", "Stinging", "Bloating",
-      "Tonsillectomy", "Potassium level", "Overactive thyroid", "Gymnastics", "Anaemia", "Indoor exercises", "Tongue-tie", "Crusty mucus",
-      "Dyspepsia", "Crowded places", "White crusts", "Antihistamine", "Breathless", "Infertile", "Night sweats", "Sticky", "Strangulation",
-      "Lying flat", "Surveyor", "Clockwise", "Left calf", "Punctured lung", "Social gatherings", "Tinnitus", "Vomited", "Injection",
-      "Hearing loss", "Stomach", "Groin", "Gastric bypass", "Confidence", "Concentration", "Fluid retention", "Wheeze", "Murmur",
-      "Endoscopy", "Physiotherapist", "Breathing difficulty", "Heart failure", "Stroke", "Seizures", "Fracture", "Abdominal pain",
-      "Urinary retention", "Chest infection", "Asthma", "Hypertension", "Diabetes", "Thyroid problem", "Kidney disease", "Liver disease",
-      "Gallstones", "Coughing blood", "Blood in urine", "Swelling in legs", "Palpitations", "Syncope", "Sudden weight loss", "Sudden weight gain",
-      "Dizziness", "Vertigo", "Fatigue", "Loss of appetite", "Vomiting blood", "Dark stools", "Difficulty swallowing", "Persistent cough",
-      "Fever", "Night chills", "Weight loss", "Pain during urination", "Shortness of breath", "Wheezing", "Joint pain", "Back pain",
-      "Neck pain", "Shoulder pain", "Hip pain", "Knee pain", "Ankle pain", "Foot pain", "Hand pain", "Elbow pain", "Wrist pain",
-      "Chest pain", "Lower abdominal pain", "Upper abdominal pain", "Diarrhoea", "Constipation", "Bloating", "Heartburn", "Nausea and vomiting",
-      "Jaundice", "Frequent urination", "Urgency", "Incontinence", "Painful urination", "Blood in stool", "Change in bowel habits", "Skin rash",
-      "Itching", "Bruising", "Bleeding", "Numbness", "Tingling", "Muscle weakness", "Memory loss", "Speech difficulties", "Vision problems",
-      "Hearing problems", "Balance problems", "Depression", "Anxiety", "Sleep disturbances"
-    ];
-
-    let userEmail = "";
-    let currentAccent = 'en-GB';
-    let currentWordIndex = 0;
-    let correctCount = 0;
-
-    const trainerDiv = document.getElementById("trainer");
-    const scoreDisplay = document.getElementById("scoreDisplay");
-
+    // Enhanced word lists with priority OET words first
     const examWordLists = {
-      OET: words,
+      OET: [
+        // Priority words (added first)
+        "Jaundice", "Cirrhosis", "Dark", "Bilirubin", "Septicemia",
+        "Prostatic cancer", "Bring up", "Work", "Constipation", "Hepatitis",
+        "Exercise", "Stiff", "Abdominal cramps", "Vegetarian", "Stress",
+        "Graphic designer", "Down syndrome", "Blurred vision", "Alcohol",
+        "Cognitive behaviour", "Tennis ball", "Spasm", "Surveyor",
+        "Crowded places", "Pneumonia",
+        
+        // Rest of OET words from document
+        "Asking", "Nausea", "Indigestion", "Full blood count", "Cloudy",
+        "Cold compress", "Lethargic", "Confidence", "Popping", "Clicking",
+        "Heel", "Osteoarthritis", "Deep vein thrombosis", "Atrial fibrillation",
+        "Swollen", "Yoga", "Aerobic exercises", "Physiotherapy session", "Calf",
+        "Calves", "Crutches", "Translator", "Mouth ulcers", "Infection",
+        "Compartment syndrome", "Painkillers", "Antisocial", "Chills",
+        "Fingertips", "B12 deficiency", "Angina", "Rib cage", "Swallowing",
+        "Drained", "Confusion", "Shivering", "Stinging", "Bloating",
+        "Tonsillectomy", "Potassium level", "Overactive thyroid", "Gymnastics",
+        "Anaemia", "Indoor exercises", "Tongue-tie", "Crusty mucus",
+        "Dyspepsia", "Crowded places", "White crusts", "Antihistamine",
+        "Breathless", "Infertile", "Night sweats", "Sticky", "Strangulation",
+        "Lying flat", "Surveyor", "Clockwise", "Left calf", "Punctured lung",
+        "Social gatherings", "Tinnitus", "Vomited", "Injection",
+        "Hearing loss", "Stomach", "Groin", "Gastric bypass", "Concentration",
+        "Fluid retention", "Wheeze", "Murmur",
+        "Endoscopy", "Physiotherapist", "Breathing difficulty", "Heart failure",
+        "Stroke", "Seizures", "Fracture", "Abdominal pain",
+        "Urinary retention", "Chest infection", "Asthma", "Hypertension",
+        "Diabetes", "Thyroid problem", "Kidney disease", "Liver disease",
+        "Gallstones", "Coughing blood", "Blood in urine", "Swelling in legs",
+        "Palpitations", "Syncope", "Sudden weight loss", "Sudden weight gain",
+        "Dizziness", "Vertigo", "Fatigue", "Loss of appetite", "Vomiting blood",
+        "Dark stools", "Difficulty swallowing", "Persistent cough",
+        "Fever", "Night chills", "Weight loss", "Pain during urination",
+        "Shortness of breath", "Wheezing", "Joint pain", "Back pain",
+        "Neck pain", "Shoulder pain", "Hip pain", "Knee pain", "Ankle pain",
+        "Foot pain", "Hand pain", "Elbow pain", "Wrist pain",
+        "Chest pain", "Lower abdominal pain", "Upper abdominal pain", "Diarrhoea",
+        "Constipation", "Bloating", "Heartburn", "Nausea and vomiting",
+        "Jaundice", "Frequent urination", "Urgency", "Incontinence",
+        "Painful urination", "Blood in stool", "Change in bowel habits", "Skin rash",
+        "Itching", "Bruising", "Bleeding", "Numbness", "Tingling",
+        "Muscle weakness", "Memory loss", "Speech difficulties", "Vision problems",
+        "Hearing problems", "Balance problems", "Depression", "Anxiety",
+        "Sleep disturbances"
+      ],
       IELTS: ['confidence', 'lethargic', 'philosophy', 'resilience', 'environment'],
       TOEFL: ['academic', 'theory', 'hypothesis', 'phenomenon', 'research']
     };
 
+    let words = [];
+    let userEmail = "";
+    let currentAccent = 'en-GB';
+    let currentWordIndex = 0;
+    let correctCount = 0;
+    let flaggedWords = [];
+    let incorrectWords = [];
+    let previousWords = [];
+    let isReviewMode = false;
+
+    const trainerDiv = document.getElementById("trainer");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+
     window.onload = function() {
-      startTrainer();
+      // Initialize with empty word list
+      words = [];
+      updateUI();
     }
 
     function loginUser() {
@@ -152,11 +212,29 @@
       speechSynthesis.speak(utterance);
     }
 
+    function loadExamWords() {
+      const exam = document.getElementById('examSelect').value;
+      if (exam && examWordLists[exam]) {
+        words = [...examWordLists[exam]];
+        startTrainer();
+      } else {
+        words = [];
+        trainerDiv.innerHTML = '<p>Select an exam or add custom words to begin</p>';
+      }
+    }
+
     function startTrainer() {
       trainerDiv.innerHTML = '';
-      if (words.length === 0) return;
+      if (words.length === 0) {
+        trainerDiv.innerHTML = '<p>No words to practice. Add words or select an exam.</p>';
+        return;
+      }
       currentWordIndex = 0;
       correctCount = 0;
+      incorrectWords = [];
+      previousWords = [];
+      flaggedWords = [];
+      isReviewMode = false;
       scoreDisplay.textContent = '';
       presentWord();
     }
@@ -167,6 +245,9 @@
 
       const box = document.createElement("div");
       box.className = "word-box";
+      if (flaggedWords.includes(currentWordIndex)) {
+        box.classList.add("flagged");
+      }
 
       const title = document.createElement("div");
       title.innerHTML = `<strong>Word ${currentWordIndex + 1} of ${words.length}</strong>`;
@@ -178,16 +259,46 @@
       const input = document.createElement("input");
       input.type = "text";
       input.placeholder = "Type what you heard...";
+      input.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") checkAnswer();
+      });
 
       const checkBtn = document.createElement("button");
       checkBtn.textContent = "✔️ Check";
+      checkBtn.onclick = checkAnswer;
+
+      const flagBtn = document.createElement("button");
+      flagBtn.textContent = flaggedWords.includes(currentWordIndex) ? "🚩 Unflag" : "🚩 Flag";
+      flagBtn.onclick = () => {
+        const index = flaggedWords.indexOf(currentWordIndex);
+        if (index === -1) {
+          flaggedWords.push(currentWordIndex);
+          flagBtn.textContent = "🚩 Unflag";
+          box.classList.add("flagged");
+        } else {
+          flaggedWords.splice(index, 1);
+          flagBtn.textContent = "🚩 Flag";
+          box.classList.remove("flagged");
+        }
+      };
+
+      const backBtn = document.createElement("button");
+      backBtn.textContent = "↩️ Back";
+      backBtn.disabled = previousWords.length === 0;
+      backBtn.onclick = () => {
+        if (previousWords.length > 0) {
+          currentWordIndex = previousWords.pop();
+          presentWord();
+        }
+      };
 
       const status = document.createElement("span");
       status.className = "status";
 
-      checkBtn.onclick = () => {
+      function checkAnswer() {
         const typed = input.value.trim().toLowerCase();
         const expected = word.toLowerCase();
+        previousWords.push(currentWordIndex);
 
         if (typed === expected) {
           status.textContent = "✅ Correct";
@@ -196,6 +307,10 @@
         } else {
           status.textContent = `❌ Wrong. Correct: ${word}`;
           status.style.color = "red";
+          incorrectWords.push({
+            word: word,
+            typed: typed
+          });
         }
 
         setTimeout(() => {
@@ -206,20 +321,88 @@
             showScore();
           }
         }, 1500);
-      };
+      }
 
       box.appendChild(title);
       box.appendChild(speakBtn);
+      box.appendChild(document.createElement("br"));
       box.appendChild(input);
       box.appendChild(checkBtn);
+      box.appendChild(flagBtn);
+      
+      const controlsDiv = document.createElement("div");
+      controlsDiv.className = "controls";
+      controlsDiv.appendChild(backBtn);
+      box.appendChild(controlsDiv);
+      
       box.appendChild(status);
-
       trainerDiv.appendChild(box);
       speak(word);
     }
 
     function showScore() {
-      scoreDisplay.textContent = `You got ${correctCount} out of ${words.length} correct!`;
+      scoreDisplay.innerHTML = `
+        <div>You got ${correctCount} out of ${words.length} correct! (${Math.round(correctCount/words.length*100)}%)</div>
+      `;
+
+      if (incorrectWords.length > 0) {
+        const reviewDiv = document.createElement("div");
+        reviewDiv.className = "review-section";
+        reviewDiv.innerHTML = "<h3>Words to Review:</h3>";
+        
+        incorrectWords.forEach(item => {
+          const reviewItem = document.createElement("div");
+          reviewItem.className = "review-item";
+          reviewItem.textContent = `You wrote "${item.typed}" instead of "${item.word}"`;
+          reviewDiv.appendChild(reviewItem);
+        });
+
+        const retryBtn = document.createElement("button");
+        retryBtn.textContent = "🔄 Retry Incorrect Words";
+        retryBtn.onclick = () => {
+          words = incorrectWords.map(item => item.word);
+          incorrectWords = [];
+          correctCount = 0;
+          currentWordIndex = 0;
+          previousWords = [];
+          isReviewMode = true;
+          scoreDisplay.innerHTML = "";
+          presentWord();
+        };
+        reviewDiv.appendChild(retryBtn);
+
+        scoreDisplay.appendChild(reviewDiv);
+      }
+
+      if (flaggedWords.length > 0) {
+        const flaggedDiv = document.createElement("div");
+        flaggedDiv.className = "review-section";
+        flaggedDiv.style.backgroundColor = "#fff3cd";
+        flaggedDiv.innerHTML = "<h3>Flagged Words:</h3>";
+        
+        flaggedWords.forEach(index => {
+          const flaggedItem = document.createElement("div");
+          flaggedItem.className = "review-item";
+          flaggedItem.textContent = words[index];
+          flaggedDiv.appendChild(flaggedItem);
+        });
+
+        const practiceFlaggedBtn = document.createElement("button");
+        practiceFlaggedBtn.textContent = "🔖 Practice Flagged Words";
+        practiceFlaggedBtn.onclick = () => {
+          words = flaggedWords.map(index => words[index]);
+          incorrectWords = [];
+          correctCount = 0;
+          currentWordIndex = 0;
+          previousWords = [];
+          isReviewMode = true;
+          scoreDisplay.innerHTML = "";
+          presentWord();
+        };
+        flaggedDiv.appendChild(practiceFlaggedBtn);
+
+        scoreDisplay.appendChild(flaggedDiv);
+      }
     }
 
     function addCustomWords() {
@@ -267,36 +450,38 @@
       reader.readAsText(file);
     }
 
-    function suggestWords() {
-      const exam = document.getElementById('examSelect').value;
-      if (exam && examWordLists[exam]) {
-        words = examWordLists[exam];
-        startTrainer();
-      }
-    }
-
     function saveWordList() {
-      if (!userEmail) return alert("Login with your email to save.");
+      if (!userEmail) return alert("Please login with your email to save.");
       localStorage.setItem("spellright-list-" + userEmail, JSON.stringify(words));
-      alert("Saved!");
+      alert("Word list saved!");
     }
 
     function loadWordList() {
-      if (!userEmail) return alert("Login with your email to load.");
+      if (!userEmail) return alert("Please login with your email to load.");
       const saved = localStorage.getItem("spellright-list-" + userEmail);
       if (saved) {
         words = JSON.parse(saved);
         startTrainer();
-        alert("Loaded!");
+        alert("Word list loaded!");
       } else {
-        alert("No list found for this email.");
+        alert("No saved list found for this email.");
       }
     }
 
     function clearWordList() {
-      words = [];
-      trainerDiv.innerHTML = '';
-      scoreDisplay.textContent = '';
+      if (confirm("Are you sure you want to clear all words?")) {
+        words = [];
+        trainerDiv.innerHTML = '<p>Word list cleared. Add new words or select an exam.</p>';
+        scoreDisplay.textContent = '';
+      }
+    }
+
+    function updateUI() {
+      if (words.length > 0) {
+        startTrainer();
+      } else {
+        trainerDiv.innerHTML = '<p>No words to practice. Add words or select an exam.</p>';
+      }
     }
   </script>
 </body>
