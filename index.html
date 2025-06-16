@@ -1,40 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#4CAF50">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Spell Right Pro</title>
-    <!-- Manifest -->
     <link rel="manifest" href="manifest.json">
-    <!-- Google AdSense (replace ca-pub-XXXX with your code) -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXX"
-        crossorigin="anonymous"></script>
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="icons/icon-192.png">
 </head>
+
 <body>
-    <h1>Welcome to Spell Right Pro</h1>
-    <!-- Example AdSense Banner -->
-    <ins class="adsbygoogle"
-        style="display:block"
-        data-ad-client="ca-pub-XXXX"
-        data-ad-slot="1234567890"
-        data-ad-format="auto"
-        data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-    <!-- Your app content starts here -->
-    <div id="app">
-        <!-- Existing App Content (if any) -->
-    </div>
-    <!-- Service Worker Registration -->
+    <h1>Spell Right Pro</h1>
+    <p>Select an exam type and start your spelling training!</p>
+
+    <select id="examSelect">
+        <option value="none">None</option>
+        <option value="oet">OET</option>
+        <option value="ielts">IELTS</option>
+    </select>
+
+    <input type="file" id="fileInput" style="display:none;">
+    <button id="uploadButton">Upload Word List</button>
+    <button id="startButton">Start Training</button>
+
+    <div id="wordDisplay"></div>
+    <input type="text" id="userInput" placeholder="Type the spelling here">
+    <button id="checkButton">Check Spelling</button>
+
+    <div id="result"></div>
+    <div id="score"></div>
+
+    <script src="app.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('service-worker.js')
-                .then(registration => {
-                    console.log('Service Worker registered with scope:', registration.scope);
-                }).catch(error => {
-                    console.log('Service Worker registration failed:', error);
-                });
+                .then(reg => console.log('Service Worker registered', reg))
+                .catch(err => console.error('Service Worker registration failed', err));
         }
     </script>
 </body>
+
 </html>
