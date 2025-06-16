@@ -1,84 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <link rel="manifest" href="manifest.json">
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Spell Right Pro</title>
-  <link rel="icon" href="logo.png" />
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f7fafc;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-      color: #333;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4CAF50">
+    <title>Spell Right Pro</title>
 
-    header {
-      background-color: #0057b7;
-      color: white;
-      padding: 30px 15px;
-    }
+    <!-- Manifest -->
+    <link rel="manifest" href="manifest.json">
 
-    header h1 {
-      font-size: 2.5em;
-      margin-bottom: 10px;
-    }
-
-    header p {
-      font-size: 1.2em;
-      margin: 0;
-    }
-
-    main {
-      padding: 40px 20px;
-    }
-
-    .btn-primary {
-      background-color: #0057b7;
-      color: white;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1em;
-      cursor: pointer;
-      transition: background 0.3s;
-      margin-top: 20px;
-    }
-
-    .btn-primary:hover {
-      background-color: #0041a3;
-    }
-
-    footer {
-      background: #eee;
-      padding: 10px;
-      font-size: 0.9em;
-      margin-top: 40px;
-    }
-
-    img.logo {
-      width: 100px;
-      margin-bottom: 15px;
-    }
-  </style>
+    <!-- Google AdSense (replace ca-pub-XXXX with your code) -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXX"
+        crossorigin="anonymous"></script>
 </head>
+
 <body>
-  <header>
-    <img src="logo.png" alt="Spell Right Pro Logo" class="logo"/>
-    <h1>Spell Right Pro</h1>
-    <p>Your smart accent-based spelling trainer</p>
-  </header>
+    <h1>Welcome to Spell Right Pro</h1>
 
-  <main>
-    <p>Train for IELTS, OET, TOEFL and more with accurate audio, custom word lists, and accent selection.</p>
-    <a href="app.html"><button class="btn-primary">Start Training</button></a>
-  </main>
+    <!-- Example AdSense Banner -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-XXXX"
+        data-ad-slot="1234567890"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 
-  <footer>
-    &copy; 2025 Spell Right Pro. All rights reserved.
-  </footer>
+    <!-- Your app content starts here -->
+    <div id="app">
+        <!-- Existing App Content (if any) -->
+    </div>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(registration => {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                }).catch(error => {
+                    console.log('Service Worker registration failed:', error);
+                });
+        }
+    </script>
 </body>
+
 </html>
