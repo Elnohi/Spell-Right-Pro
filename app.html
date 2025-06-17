@@ -1,76 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- PWA Metadata -->
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#f0f4f8">
-  
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-W9C17T6FB7"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-W9C17T6FB7');
-  </script>
-
-  <title>Spell Right Pro</title>
-  <style>
-    /* [Keep all your original styles here] */
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #f0f4f8;
-    }
-    /* ... rest of your CSS ... */
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spell Right Pro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f0f4f8;
+        }
+        .word-box {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        button {
+            margin: 5px 5px 5px 0;
+            padding: 8px 12px;
+        }
+        input[type="text"], input[type="email"] {
+            padding: 8px;
+            width: 250px;
+        }
+        .status {
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        #trainer {
+            min-height: 200px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Spell Right Pro</h1>
+    <h1>Spell Right Pro</h1>
+    
+    <div>
+        <label>Select Exam:
+            <select id="examSelect">
+                <option value="">-- None --</option>
+                <option value="OET">OET</option>
+                <option value="IELTS">IELTS</option>
+            </select>
+        </label>
+        <button id="startBtn">Start Training</button>
+    </div>
 
-  <div id="loginSection">
-    <label>Email: <input type="email" id="userEmail" /></label>
-    <button id="loginBtn">🔐 Login</button>
-    <span id="loginStatus"></span>
-  </div>
+    <div id="trainer"></div>
+    <div id="scoreDisplay" style="margin-top:20px; font-weight:bold;"></div>
 
-  <div id="accentSection">
-    <label>Accent:
-      <select id="accentSelect">
-        <option value="en-GB">British</option>
-        <option value="en-US">American</option>
-        <option value="en-CA">Canadian</option>
-        <option value="en-AU">Australian</option>
-      </select>
-    </label>
-  </div>
-
-  <div id="examSection">
-    <label>Select Exam:
-      <select id="examSelect">
-        <option value="">-- None --</option>
-        <option value="OET">OET</option>
-        <option value="IELTS">IELTS</option>
-        <option value="TOEFL">TOEFL</option>
-      </select>
-    </label>
-    <button id="startBtn">Start Training</button>
-  </div>
-
-  <div id="trainer"></div>
-
-  <!-- [Rest of your original HTML remains unchanged] -->
-
-  <script src="app.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js')
-          .catch(err => console.log('ServiceWorker registration failed: ', err));
-      });
-    }
-  </script>
+    <script src="app.js"></script>
 </body>
 </html>
