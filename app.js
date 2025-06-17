@@ -1,4 +1,3 @@
-
 // Full OET word list (preloaded)
 let words = [
   "Strawberry tongue", "Irritable", "Washing hair", "Sepsis", "Pneumonia", "Diabetes", "Knife and fork", "Scarlet fever", "Bloodshot",
