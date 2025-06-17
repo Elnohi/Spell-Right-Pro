@@ -35,6 +35,9 @@ let currentAccent = 'en-GB';
 let currentWordIndex = 0;
 let correctCount = 0;
 
+let trainerDiv;
+let scoreDisplay;
+
 const examWordLists = {
   OET: words,
   IELTS: ['confidence', 'lethargic', 'philosophy', 'resilience', 'environment'],
