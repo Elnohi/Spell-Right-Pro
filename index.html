@@ -1,36 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+    <!-- PWA Configuration -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Spell Right Pro</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="icons/icon-192.png">
-</head>
 
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W9C17T6FB7"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-W9C17T6FB7');
+    </script>
+
+    <title>Spell Right Pro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f0f4f8;
+        }
+        .word-box {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        button {
+            margin: 5px 5px 5px 0;
+            padding: 8px 12px;
+        }
+        input[type="text"], input[type="email"] {
+            padding: 8px;
+            width: 250px;
+        }
+        .status {
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        #uploadSection, #saveControls, #loginSection, #accentSection, #examSection {
+            margin-top: 30px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        textarea {
+            width: 100%;
+            margin-top: 10px;
+            padding: 8px;
+            min-height: 100px;
+        }
+        label.checkbox-label {
+            display: block;
+            margin: 10px 0;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .flagged {
+            background-color: #fff3cd !important;
+        }
+        .review-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8d7da;
+            border-radius: 10px;
+        }
+        .review-item {
+            margin: 5px 0;
+            padding: 5px;
+        }
+    </style>
+</head>
 <body>
     <h1>Spell Right Pro</h1>
-    <p>Select an exam type and start your spelling training!</p>
 
-    <select id="examSelect">
-        <option value="none">None</option>
-        <option value="oet">OET</option>
-        <option value="ielts">IELTS</option>
-    </select>
+    <div id="loginSection">
+        <label>Email: <input type="email" id="userEmail" /></label>
+        <button id="loginBtn">🔐 Login</button>
+        <span id="loginStatus"></span>
+    </div>
 
-    <input type="file" id="fileInput" style="display:none;">
-    <button id="uploadButton">Upload Word List</button>
-    <button id="startButton">Start Training</button>
+    <div id="accentSection">
+        <label>Accent:
+            <select id="accentSelect">
+                <option value="en-GB">British</option>
+                <option value="en-US">American</option>
+                <option value="en-CA">Canadian</option>
+                <option value="en-AU">Australian</option>
+            </select>
+        </label>
+    </div>
 
-    <div id="wordDisplay"></div>
-    <input type="text" id="userInput" placeholder="Type the spelling here">
-    <button id="checkButton">Check Spelling</button>
+    <div id="examSection">
+        <label>Select Exam:
+            <select id="examSelect">
+                <option value="">-- None --</option>
+                <option value="OET">OET</option>
+                <option value="IELTS">IELTS</option>
+                <option value="TOEFL">TOEFL</option>
+            </select>
+        </label>
+    </div>
 
-    <div id="result"></div>
-    <div id="score"></div>
+    <div id="trainer"></div>
+
+    <div id="uploadSection">
+        <h3>Add Words</h3>
+        <textarea id="wordInput" rows="4" placeholder="Enter words or phrases separated by commas, slashes, dashes, or line breaks..."></textarea>
+        <label class="checkbox-label">
+            <input type="checkbox" id="phraseToggle" /> Read as phrases
+        </label>
+        <button id="addWordsBtn">➕ Add Words</button>
+        <input type="file" id="fileUpload" accept=".txt" />
+    </div>
+
+    <div id="saveControls">
+        <button id="saveBtn">💾 Save List</button>
+        <button id="loadBtn">📂 Load List</button>
+        <button id="clearBtn">🗑 Clear</button>
+    </div>
+
+    <div id="scoreDisplay" style="margin-top:20px; font-weight:bold;"></div>
 
     <script src="app.js"></script>
     <script>
@@ -41,5 +141,4 @@
         }
     </script>
 </body>
-
 </html>
