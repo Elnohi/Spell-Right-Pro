@@ -6,10 +6,7 @@ let words = [
   "Administrator", "Preventer", "Steroid", "Menstruation", "Car accident", "Fuzzy", "Injection", "Lunch time", "Hearing loss",
   "Swallow", "Vocabulary", "Vascular", "Eating", "Some sort of food", "Urinalysis", "Deafness", "Magazine editor", "Lethargic",
   "Visual perception", "Heartbeats", "Tightness", "Financial problems", "Cut two fingers", "Nausea", "Lung expansion", "Tantrum",
-  "Groin area",
-
-  // Existing words continue here
-  "Asking", "Nausea", "Indigestion", "Full blood count", "Cloudy", "Cold compress", "Lethargic", "Confidence", "Popping", "Clicking", "Heel",
+  "Groin area", "Asking", "Nausea", "Indigestion", "Full blood count", "Cloudy", "Cold compress", "Lethargic", "Confidence", "Popping", "Clicking", "Heel",
   "Osteoarthritis", "Deep vein thrombosis", "Atrial fibrillation", "Swollen", "Yoga", "Aerobic exercises", "Physiotherapy session", "Calf",
   "Calves", "Crutches", "Translator", "Mouth ulcers", "Infection", "Compartment syndrome", "Painkillers", "Antisocial", "Chills",
   "Fingertips", "B12 deficiency", "Angina", "Rib cage", "Swallowing", "Drained", "Confusion", "Shivering", "Stinging", "Bloating",
@@ -28,39 +25,32 @@ let words = [
   "Itching", "Bruising", "Bleeding", "Numbness", "Tingling", "Muscle weakness", "Memory loss", "Speech difficulties", "Vision problems",
   "Hearing problems", "Balance problems", "Depression", "Anxiety", "Sleep disturbances"
 ];
-
 let userEmail = "";
 let currentAccent = 'en-GB';
 let currentWordIndex = 0;
 let correctCount = 0;
-
 const examWordLists = {
   OET: words,
   IELTS: ['confidence', 'lethargic', 'philosophy', 'resilience', 'environment'],
   TOEFL: ['academic', 'theory', 'hypothesis', 'phenomenon', 'research']
 };
-
 document.addEventListener("DOMContentLoaded", function () {
   trainerDiv = document.getElementById("trainer");
   scoreDisplay = document.getElementById("scoreDisplay");
   startTrainer();
 });
-
 function loginUser() {
   userEmail = document.getElementById("userEmail").value.trim();
   document.getElementById("loginStatus").textContent = userEmail ? `Logged in as ${userEmail}` : '';
 }
-
 function changeAccent() {
   currentAccent = document.getElementById("accentSelect").value;
 }
-
 function speak(text) {
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = currentAccent;
   speechSynthesis.speak(utterance);
 }
-
 function startTrainer() {
   trainerDiv.innerHTML = '';
   if (words.length === 0) return;
@@ -69,35 +59,26 @@ function startTrainer() {
   scoreDisplay.textContent = '';
   presentWord();
 }
-
 function presentWord() {
   trainerDiv.innerHTML = '';
   const word = words[currentWordIndex];
-
   const box = document.createElement("div");
   box.className = "word-box";
-
   const title = document.createElement("div");
   title.innerHTML = `<strong>Word ${currentWordIndex + 1} of ${words.length}</strong>`;
-
   const speakBtn = document.createElement("button");
   speakBtn.textContent = "🔊 Speak";
   speakBtn.onclick = () => speak(word);
-
   const input = document.createElement("input");
   input.type = "text";
   input.placeholder = "Type what you heard...";
-
   const checkBtn = document.createElement("button");
   checkBtn.textContent = "✔️ Check";
-
   const status = document.createElement("span");
   status.className = "status";
-
   checkBtn.onclick = () => {
     const typed = input.value.trim().toLowerCase();
     const expected = word.toLowerCase();
-
     if (typed === expected) {
       status.textContent = "✅ Correct";
       status.style.color = "green";
@@ -106,7 +87,6 @@ function presentWord() {
       status.textContent = `❌ Wrong. Correct: ${word}`;
       status.style.color = "red";
     }
-
     setTimeout(() => {
       currentWordIndex++;
       if (currentWordIndex < words.length) {
@@ -116,17 +96,14 @@ function presentWord() {
       }
     }, 1500);
   };
-
   box.appendChild(title);
   box.appendChild(speakBtn);
   box.appendChild(input);
   box.appendChild(checkBtn);
   box.appendChild(status);
-
   trainerDiv.appendChild(box);
   speak(word);
 }
-
 function showScore() {
   scoreDisplay.textContent = `You got ${correctCount} out of ${words.length} correct!`;
 }
@@ -135,7 +112,6 @@ function addCustomWords() {
   const input = document.getElementById("wordInput").value.trim();
   const asPhrases = document.getElementById("phraseToggle").checked;
   if (!input) return;
-
   let newWords = [];
   if (asPhrases) {
     newWords = input.split(/[
@@ -147,22 +123,18 @@ function addCustomWords() {
       .flatMap(phrase => phrase.trim().split(/\s+/))
       .filter(Boolean);
   }
-
   words = newWords;
   document.getElementById("wordInput").value = "";
   startTrainer();
 }
-
 function handleFileUpload(event) {
   const file = event.target.files[0];
   const asPhrases = document.getElementById("phraseToggle").checked;
   if (!file) return;
-
   const reader = new FileReader();
   reader.onload = function (e) {
     const content = e.target.result;
     let newWords = [];
-
     if (asPhrases) {
       newWords = content.split(/[
 ,\/\-]+/).map(w => w.trim()).filter(Boolean);
@@ -173,13 +145,11 @@ function handleFileUpload(event) {
         .flatMap(phrase => phrase.trim().split(/\s+/))
         .filter(Boolean);
     }
-
     words = newWords;
     startTrainer();
   };
   reader.readAsText(file);
 }
-
 function suggestWords() {
   const exam = document.getElementById('examSelect').value;
   if (exam && examWordLists[exam]) {
@@ -187,13 +157,11 @@ function suggestWords() {
     startTrainer();
   }
 }
-
 function saveWordList() {
   if (!userEmail) return alert("Login with your email to save.");
   localStorage.setItem("spellright-list-" + userEmail, JSON.stringify(words));
   alert("Saved!");
 }
-
 function loadWordList() {
   if (!userEmail) return alert("Login with your email to load.");
   const saved = localStorage.getItem("spellright-list-" + userEmail);
@@ -205,7 +173,6 @@ function loadWordList() {
     alert("No list found for this email.");
   }
 }
-
 function clearWordList() {
   words = [];
   trainerDiv.innerHTML = '';
