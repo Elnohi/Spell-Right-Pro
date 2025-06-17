@@ -6,16 +6,15 @@
   "background_color": "#f0f4f8",
   "theme_color": "#f0f4f8",
   "description": "Medical spelling practice application",
-  "icons": [
-    {
-      "src": "icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
-}
+"icons": [
+  {
+    "src": "icon-192.png",  // Removed "icons/" prefix
+    "sizes": "192x192",
+    "type": "image/png"
+  },
+  {
+    "src": "icon-512.png",  // Removed "icons/" prefix
+    "sizes": "512x512",
+    "type": "image/png"
+  }
+]
