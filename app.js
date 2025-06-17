@@ -23,8 +23,10 @@ let words = [];
 let currentWordIndex = 0;
 let correctCount = 0;
 
-// Initialize
-startBtn.addEventListener("click", startTrainer);
+// Initialize safely
+if (startBtn) {
+    startBtn.addEventListener("click", startTrainer);
+}
 
 function startTrainer() {
     const exam = examSelect.value;
@@ -32,13 +34,13 @@ function startTrainer() {
         alert("Please select an exam first!");
         return;
     }
-    
+
     words = examWordLists[exam] || [];
     if (words.length === 0) {
         trainerDiv.innerHTML = "<p>No words available for this exam</p>";
         return;
     }
-    
+
     currentWordIndex = 0;
     correctCount = 0;
     scoreDisplay.textContent = "";
@@ -50,7 +52,7 @@ function presentWord() {
         showScore();
         return;
     }
-    
+
     const word = words[currentWordIndex];
     trainerDiv.innerHTML = `
         <div class="word-box">
@@ -61,14 +63,13 @@ function presentWord() {
             <span id="status" class="status"></span>
         </div>
     `;
-    
-    document.addEventListener("DOMContentLoaded", function () {
-  const btn = document.getElementById("startButton");
-  if (btn) {
-    btn.addEventListener("click", startTrainer);
-  }
-});
-    
+
+    // Attach event to check button
+    const checkBtn = document.getElementById("checkBtn");
+    if (checkBtn) {
+        checkBtn.addEventListener("click", checkAnswer);
+    }
+
     // Auto-speak the word
     speak(word);
 }
@@ -87,7 +88,7 @@ function checkAnswer() {
     const input = document.getElementById("wordInput");
     const status = document.getElementById("status");
     const word = words[currentWordIndex];
-    
+
     if (input.value.trim().toLowerCase() === word.toLowerCase()) {
         status.textContent = "✅ Correct";
         status.style.color = "green";
@@ -96,7 +97,7 @@ function checkAnswer() {
         status.textContent = `❌ Wrong. Correct: ${word}`;
         status.style.color = "red";
     }
-    
+
     setTimeout(() => {
         currentWordIndex++;
         presentWord();
@@ -105,7 +106,7 @@ function checkAnswer() {
 
 function showScore() {
     scoreDisplay.innerHTML = `
-        <div>You got ${correctCount} out of ${words.length} correct! (${Math.round(correctCount/words.length*100)}%)</div>
+        <div>You got ${correctCount} out of ${words.length} correct! (${Math.round(correctCount / words.length * 100)}%)</div>
     `;
     trainerDiv.innerHTML = "<p>Training complete! Select an exam to start again.</p>";
 }
