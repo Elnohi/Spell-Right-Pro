@@ -1,77 +1,201 @@
-// Sample app.js for Spell Right Pro
+// Full OET word list (preloaded)
+let words = [
+  "Asking", "Nausea", "Indigestion", "Full blood count", "Cloudy", "Cold compress", "Lethargic", "Confidence", "Popping", "Clicking", "Heel",
+  "Osteoarthritis", "Deep vein thrombosis", "Atrial fibrillation", "Swollen", "Yoga", "Aerobic exercises", "Physiotherapy session", "Calf",
+  "Calves", "Crutches", "Translator", "Mouth ulcers", "Infection", "Compartment syndrome", "Painkillers", "Antisocial", "Chills",
+  "Fingertips", "B12 deficiency", "Angina", "Rib cage", "Swallowing", "Drained", "Confusion", "Shivering", "Stinging", "Bloating",
+  "Tonsillectomy", "Potassium level", "Overactive thyroid", "Gymnastics", "Anaemia", "Indoor exercises", "Tongue-tie", "Crusty mucus",
+  "Dyspepsia", "Crowded places", "White crusts", "Antihistamine", "Breathless", "Infertile", "Night sweats", "Sticky", "Strangulation",
+  "Lying flat", "Surveyor", "Clockwise", "Left calf", "Punctured lung", "Social gatherings", "Tinnitus", "Vomited", "Injection",
+  "Hearing loss", "Stomach", "Groin", "Gastric bypass", "Confidence", "Concentration", "Fluid retention", "Wheeze", "Murmur",
+  "Endoscopy", "Physiotherapist", "Breathing difficulty", "Heart failure", "Stroke", "Seizures", "Fracture", "Abdominal pain",
+  "Urinary retention", "Chest infection", "Asthma", "Hypertension", "Diabetes", "Thyroid problem", "Kidney disease", "Liver disease",
+  "Gallstones", "Coughing blood", "Blood in urine", "Swelling in legs", "Palpitations", "Syncope", "Sudden weight loss", "Sudden weight gain",
+  "Dizziness", "Vertigo", "Fatigue", "Loss of appetite", "Vomiting blood", "Dark stools", "Difficulty swallowing", "Persistent cough",
+  "Fever", "Night chills", "Weight loss", "Pain during urination", "Shortness of breath", "Wheezing", "Joint pain", "Back pain",
+  "Neck pain", "Shoulder pain", "Hip pain", "Knee pain", "Ankle pain", "Foot pain", "Hand pain", "Elbow pain", "Wrist pain",
+  "Chest pain", "Lower abdominal pain", "Upper abdominal pain", "Diarrhoea", "Constipation", "Bloating", "Heartburn", "Nausea and vomiting",
+  "Jaundice", "Frequent urination", "Urgency", "Incontinence", "Painful urination", "Blood in stool", "Change in bowel habits", "Skin rash",
+  "Itching", "Bruising", "Bleeding", "Numbness", "Tingling", "Muscle weakness", "Memory loss", "Speech difficulties", "Vision problems",
+  "Hearing problems", "Balance problems", "Depression", "Anxiety", "Sleep disturbances"
+];
 
-let wordList = [];
+let userEmail = "";
+let currentAccent = 'en-GB';
 let currentWordIndex = 0;
-let score = 0;
+let correctCount = 0;
 
-const examSelect = document.getElementById('examSelect');
-const fileInput = document.getElementById('fileInput');
-const uploadButton = document.getElementById('uploadButton');
-const startButton = document.getElementById('startButton');
-const wordDisplay = document.getElementById('wordDisplay');
-const userInput = document.getElementById('userInput');
-const checkButton = document.getElementById('checkButton');
-const resultDisplay = document.getElementById('result');
-const scoreDisplay = document.getElementById('score');
+const trainerDiv = document.getElementById("trainer");
+const scoreDisplay = document.getElementById("scoreDisplay");
 
-examSelect.addEventListener('change', () => {
-    if (examSelect.value === 'none') {
-        wordList = [];
-        wordDisplay.textContent = '';
-        resultDisplay.textContent = '';
-        scoreDisplay.textContent = '';
-    } else if (examSelect.value === 'oet') {
-        wordList = ["Jaundice", "Cirrhosis", "Bilirubin", "Hepatitis", "Septicemia"];
-    } else if (examSelect.value === 'ielts') {
-        wordList = ["Accommodation", "Environment", "Development", "Technology", "Education"];
-    }
-});
+const examWordLists = {
+  OET: words,
+  IELTS: ['confidence', 'lethargic', 'philosophy', 'resilience', 'environment'],
+  TOEFL: ['academic', 'theory', 'hypothesis', 'phenomenon', 'research']
+};
 
-uploadButton.addEventListener('click', () => {
-    fileInput.click();
-});
+window.onload = function() {
+  startTrainer();
+}
 
-fileInput.addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        const contents = e.target.result;
-        wordList = contents.split(/\r?\n/).filter(word => word.trim() !== '');
-    };
-    reader.readAsText(file);
-});
+function loginUser() {
+  userEmail = document.getElementById("userEmail").value.trim();
+  document.getElementById("loginStatus").textContent = userEmail ? `Logged in as ${userEmail}` : '';
+}
 
-startButton.addEventListener('click', () => {
-    if (wordList.length === 0) {
-        alert('Please select an exam or upload a word list.');
-        return;
-    }
-    currentWordIndex = 0;
-    score = 0;
-    scoreDisplay.textContent = '';
-    displayWord();
-});
+function changeAccent() {
+  currentAccent = document.getElementById("accentSelect").value;
+}
 
-checkButton.addEventListener('click', () => {
-    const userAnswer = userInput.value.trim();
-    if (userAnswer.toLowerCase() === wordList[currentWordIndex].toLowerCase()) {
-        resultDisplay.textContent = 'Correct!';
-        score++;
+function speak(text) {
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = currentAccent;
+  speechSynthesis.speak(utterance);
+}
+
+function startTrainer() {
+  trainerDiv.innerHTML = '';
+  if (words.length === 0) return;
+  currentWordIndex = 0;
+  correctCount = 0;
+  scoreDisplay.textContent = '';
+  presentWord();
+}
+
+function presentWord() {
+  trainerDiv.innerHTML = '';
+  const word = words[currentWordIndex];
+
+  const box = document.createElement("div");
+  box.className = "word-box";
+
+  const title = document.createElement("div");
+  title.innerHTML = `<strong>Word ${currentWordIndex + 1} of ${words.length}</strong>`;
+
+  const speakBtn = document.createElement("button");
+  speakBtn.textContent = "🔊 Speak";
+  speakBtn.onclick = () => speak(word);
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.placeholder = "Type what you heard...";
+
+  const checkBtn = document.createElement("button");
+  checkBtn.textContent = "✔️ Check";
+
+  const status = document.createElement("span");
+  status.className = "status";
+
+  checkBtn.onclick = () => {
+    const typed = input.value.trim().toLowerCase();
+    const expected = word.toLowerCase();
+
+    if (typed === expected) {
+      status.textContent = "✅ Correct";
+      status.style.color = "green";
+      correctCount++;
     } else {
-        resultDisplay.textContent = `Incorrect. Correct spelling: ${wordList[currentWordIndex]}`;
+      status.textContent = `❌ Wrong. Correct: ${word}`;
+      status.style.color = "red";
     }
-    currentWordIndex++;
 
-    if (currentWordIndex < wordList.length) {
-        displayWord();
+    setTimeout(() => {
+      currentWordIndex++;
+      if (currentWordIndex < words.length) {
+        presentWord();
+      } else {
+        showScore();
+      }
+    }, 1500);
+  };
+
+  box.appendChild(title);
+  box.appendChild(speakBtn);
+  box.appendChild(input);
+  box.appendChild(checkBtn);
+  box.appendChild(status);
+
+  trainerDiv.appendChild(box);
+  speak(word);
+}
+
+function showScore() {
+  scoreDisplay.textContent = `You got ${correctCount} out of ${words.length} correct!`;
+}
+
+function addCustomWords() {
+  const input = document.getElementById("wordInput").value.trim();
+  const asPhrases = document.getElementById("phraseToggle").checked;
+  if (!input) return;
+
+  let newWords = [];
+  if (asPhrases) {
+    newWords = input.split(/[\n,\/\-]+/).map(w => w.trim()).filter(Boolean);
+  } else {
+    newWords = input
+      .split(/[\n,\/\-]+|\s{2,}/g)
+      .flatMap(phrase => phrase.trim().split(/\s+/))
+      .filter(Boolean);
+  }
+
+  words = newWords;
+  document.getElementById("wordInput").value = "";
+  startTrainer();
+}
+
+function handleFileUpload(event) {
+  const file = event.target.files[0];
+  const asPhrases = document.getElementById("phraseToggle").checked;
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const content = e.target.result;
+    let newWords = [];
+
+    if (asPhrases) {
+      newWords = content.split(/[\n,\/\-]+/).map(w => w.trim()).filter(Boolean);
     } else {
-        wordDisplay.textContent = 'Training completed!';
-        scoreDisplay.textContent = `Your score: ${score} / ${wordList.length}`;
+      newWords = content
+        .split(/[\n,\/\-]+|\s{2,}/g)
+        .flatMap(phrase => phrase.trim().split(/\s+/))
+        .filter(Boolean);
     }
-    userInput.value = '';
-    userInput.focus();
-});
 
-function displayWord() {
-    wordDisplay.textContent = wordList[currentWordIndex];
+    words = newWords;
+    startTrainer();
+  };
+  reader.readAsText(file);
+}
+
+function suggestWords() {
+  const exam = document.getElementById('examSelect').value;
+  if (exam && examWordLists[exam]) {
+    words = examWordLists[exam];
+    startTrainer();
+  }
+}
+
+function saveWordList() {
+  if (!userEmail) return alert("Login with your email to save.");
+  localStorage.setItem("spellright-list-" + userEmail, JSON.stringify(words));
+  alert("Saved!");
+}
+
+function loadWordList() {
+  if (!userEmail) return alert("Login with your email to load.");
+  const saved = localStorage.getItem("spellright-list-" + userEmail);
+  if (saved) {
+    words = JSON.parse(saved);
+    startTrainer();
+    alert("Loaded!");
+  } else {
+    alert("No list found for this email.");
+  }
+}
+
+function clearWordList() {
+  words = [];
+  trainerDiv.innerHTML = '';
+  scoreDisplay.textContent = '';
 }
