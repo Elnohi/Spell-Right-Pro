@@ -34,9 +34,9 @@ const examWordLists = {
   TOEFL: ['academic', 'theory', 'hypothesis', 'phenomenon', 'research']
 };
 
-window.onload = function() {
+document.addEventListener("DOMContentLoaded", function() {
   startTrainer();
-}
+});
 
 function loginUser() {
   userEmail = document.getElementById("userEmail").value.trim();
