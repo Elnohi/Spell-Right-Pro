@@ -62,11 +62,12 @@ function presentWord() {
         </div>
     `;
     
-    document.getElementById("speakBtn").addEventListener("click", () => speak(word));
-    document.getElementById("checkBtn").addEventListener("click", checkAnswer);
-    document.getElementById("wordInput").addEventListener("keypress", (e) => {
-        if (e.key === "Enter") checkAnswer();
-    });
+    document.addEventListener("DOMContentLoaded", function () {
+  const btn = document.getElementById("startButton");
+  if (btn) {
+    btn.addEventListener("click", startTrainer);
+  }
+});
     
     // Auto-speak the word
     speak(word);
