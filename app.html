@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spell Right Pro</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f0f4f8;
+    }
+    .word-box {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    button {
+      margin: 5px 5px 5px 0;
+    }
+    input[type="text"], input[type="email"] {
+      padding: 5px;
+      width: 250px;
+    }
+    .status {
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    #uploadSection, #saveControls, #loginSection, #accentSection, #examSection {
+      margin-top: 30px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    textarea {
+      width: 100%;
+      margin-top: 10px;
+    }
+    label.checkbox-label {
+      display: block;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Spell Right Pro</h1>
+
+  <div id="loginSection">
+    <label>Email: <input type="email" id="userEmail" /></label>
+    <button onclick="loginUser()">🔐 Login</button>
+    <span id="loginStatus"></span>
+  </div>
+
+  <div id="accentSection">
+    <label>Accent:
+      <select id="accentSelect" onchange="changeAccent()">
+        <option value="en-GB">British</option>
+        <option value="en-US">American</option>
+        <option value="en-CA">Canadian</option>
+        <option value="en-AU">Australian</option>
+      </select>
+    </label>
+  </div>
+
+  <div id="examSection">
+    <label>Select Exam:
+      <select id="examSelect" onchange="suggestWords()">
+        <option value="">-- None --</option>
+        <option value="OET">OET</option>
+        <option value="IELTS">IELTS</option>
+        <option value="TOEFL">TOEFL</option>
+      </select>
+    </label>
+  </div>
+
+  <div id="trainer"></div>
+
+  <div id="uploadSection">
+    <h3>Add Words</h3>
+    <textarea id="wordInput" rows="4" placeholder="Enter words or phrases separated by commas, slashes, dashes, or line breaks..."></textarea>
+    <label class="checkbox-label">
+      <input type="checkbox" id="phraseToggle" /> Read as phrases
+    </label>
+    <button onclick="addCustomWords()">➕ Add Words</button>
+    <input type="file" id="fileUpload" accept=".txt" onchange="handleFileUpload(event)" />
+  </div>
+
+  <div id="saveControls">
+    <button onclick="saveWordList()">💾 Save List</button>
+    <button onclick="loadWordList()">📂 Load List</button>
+    <button onclick="clearWordList()">🗑 Clear</button>
+  </div>
+
+  <div id="scoreDisplay" style="margin-top:20px; font-weight:bold;"></div>
+
+  <!-- Link the external JavaScript file -->
+  <script src="app.js"></script>
+</body>
+</html>
