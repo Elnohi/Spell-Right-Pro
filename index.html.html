@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spell Right Pro</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4CAF50">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #f5f5f5;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:disabled {
+            background-color: #cccccc;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+        .status {
+            font-weight: bold;
+            margin: 10px 0;
+            min-height: 24px;
+        }
+        .correct { color: green; }
+        .incorrect { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Spell Right Pro</h1>
+    
+    <div class="card">
+        <h2>Exam Selection</h2>
+        <select id="examSelect">
+            <option value="">-- Select Exam --</option>
+            <option value="OET">OET</option>
+            <option value="IELTS">IELTS</option>
+        </select>
+        <button id="startBtn" disabled>Start Training</button>
+    </div>
+
+    <div id="trainer" class="card" style="display: none;">
+        <h2>Word <span id="wordCount">0</span> of <span id="totalWords">0</span></h2>
+        <div class="controls">
+            <button id="speakBtn">🔊 Speak Word</button>
+            <button id="flagBtn">🚩 Flag Word</button>
+        </div>
+        <input type="text" id="wordInput" placeholder="Type the word you hear...">
+        <button id="checkBtn">Check Answer</button>
+        <div id="status" class="status"></div>
+    </div>
+
+    <div id="results" class="card" style="display: none;">
+        <h2>Results</h2>
+        <p>Score: <span id="score">0</span>%</p>
+        <button id="restartBtn">Start New Session</button>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
