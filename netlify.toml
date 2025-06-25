@@ -1,0 +1,9 @@
+[[redirects]]
+  from = "/thank-you"
+  to = "/thankyou.html"
+  status = 200
+
+[[redirects]]
+  from = "/submission-success"
+  to = "/thankyou.html"
+  status = 200
