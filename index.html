@@ -310,6 +310,7 @@
 
   <script>
     // Initialize PDF.js worker
+    pdfjsLib = window['pdfjs-dist/build/pdf'];
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
 
     // Dark Mode Toggle
@@ -344,101 +345,108 @@
       currentAccent = document.getElementById("accentSelect").value;
     }
 
-function selectExamWords() {
-  const selectedExam = document.getElementById("examSelect").value;
-  if (selectedExam === "OET") {
-    words = [...oetWordList];
-    alert("OET word list loaded. Please start a mode.");
-  } else if (selectedExam === "SpellingBee") {
-    words = ["example", "banana", "language", "computer", "apple"];
-    alert("Spelling Bee sample list loaded. Starting Spelling Bee mode...");
-    startSpellingBee(); // Launch directly
-  } else {
-    words = [];
-    document.getElementById("trainer").innerHTML =
-      "<p>No words loaded. Please select an exam or add custom words.</p>";
-  }
-}
-let spellingBeeIndex = 0;
-
-function startSpellingBee() {
-  if (words.length === 0) {
-    alert("Please add words or select an exam first.");
-    return;
-  }
-  spellingBeeIndex = 0;
-  document.getElementById("scoreDisplay").innerHTML = "";
-  runSpellingBeeWord();
-}
-
-function runSpellingBeeWord() {
-  if (spellingBeeIndex >= words.length) {
-  showSpellingBeeScore();
-  return;
-}
-
-  const word = words[spellingBeeIndex];
-  const container = document.getElementById("trainer");
-  container.innerHTML = "";
-
-  const box = document.createElement("div");
-  box.className = "word-box";
-  box.innerHTML = `<h3>Word ${spellingBeeIndex + 1} of ${words.length}</h3><p>Listen and spell the word aloud...</p>`;
-  container.appendChild(box);
-
-  const status = document.createElement("div");
-  status.className = "status";
-  box.appendChild(status);
-
-  const utterance = new SpeechSynthesisUtterance(word);
-  utterance.lang = currentAccent;
-  utterance.onend = () => {
-    listenToSpelling(word, status);
-  };
-  speechSynthesis.speak(utterance);
-}
-
-function listenToSpelling(expectedWord, statusEl) {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    alert("Speech Recognition is not supported in this browser.");
-    return;
-  }
-
-  const recognition = new SpeechRecognition();
-  recognition.lang = "en-US";
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-
-  recognition.onresult = (event) => {
-    let spoken = event.results[0][0].transcript;
-    let cleaned = spoken.replace(/[^a-zA-Z]/g, "").toLowerCase();
-    let expected = expectedWord.toLowerCase();
-
-    if (cleaned === expected) {
-  statusEl.innerHTML = `<span class="correct">Correct: ${cleaned}</span>`;
-  spellingBeeCorrectCount++;
-    } else {
-  statusEl.innerHTML = `<span class="incorrect">Incorrect. You said: ${cleaned}<br>Correct: ${expected}</span>`;
-  spellingBeeIncorrectWords.push({ word: expectedWord, typed: cleaned });
+    function selectExamWords() {
+      const selectedExam = document.getElementById("examSelect").value;
+      if (selectedExam === "OET") {
+        words = [...oetWordList];
+        alert("OET word list loaded. Please start a mode.");
+      } else if (selectedExam === "SpellingBee") {
+        words = ["example", "banana", "language", "computer", "apple"];
+        alert("Spelling Bee sample list loaded. Starting Spelling Bee mode...");
+        startSpellingBee(); // Launch directly
+      } else {
+        words = [];
+        document.getElementById("trainer").innerHTML =
+          "<p>No words loaded. Please select an exam or add custom words.</p>";
+      }
     }
 
-    setTimeout(() => {
-      spellingBeeIndex++;
-      runSpellingBeeWord();
-    }, 3000);
-  };
+    let spellingBeeIndex = 0;
 
-  recognition.onerror = (event) => {
-    statusEl.innerHTML = `<span class="incorrect">Error: ${event.error}</span>`;
-    setTimeout(() => {
-      spellingBeeIndex++;
+    function startSpellingBee() {
+      if (words.length === 0) {
+        alert("Please add words or select an exam first.");
+        return;
+      }
+      
+      // Reset spelling bee variables
+      spellingBeeIndex = 0;
+      spellingBeeCorrectCount = 0;
+      spellingBeeIncorrectWords = [];
+      
+      document.getElementById("scoreDisplay").innerHTML = "";
       runSpellingBeeWord();
-    }, 3000);
-  };
+    }
 
-  recognition.start();
-}
+    function runSpellingBeeWord() {
+      if (spellingBeeIndex >= words.length) {
+        showSpellingBeeScore();
+        return;
+      }
+
+      const word = words[spellingBeeIndex];
+      const container = document.getElementById("trainer");
+      container.innerHTML = "";
+
+      const box = document.createElement("div");
+      box.className = "word-box";
+      box.innerHTML = `<h3>Word ${spellingBeeIndex + 1} of ${words.length}</h3><p>Listen and spell the word aloud...</p>`;
+      container.appendChild(box);
+
+      const status = document.createElement("div");
+      status.className = "status";
+      box.appendChild(status);
+
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = currentAccent;
+      utterance.onend = () => {
+        listenToSpelling(word, status);
+      };
+      speechSynthesis.speak(utterance);
+    }
+
+    function listenToSpelling(expectedWord, statusEl) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert("Speech Recognition is not supported in this browser.");
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onresult = (event) => {
+        let spoken = event.results[0][0].transcript;
+        let cleaned = spoken.replace(/[^a-zA-Z]/g, "").toLowerCase();
+        let expected = expectedWord.toLowerCase();
+
+        if (cleaned === expected) {
+          statusEl.innerHTML = `<span class="correct">Correct: ${cleaned}</span>`;
+          spellingBeeCorrectCount++;
+        } else {
+          statusEl.innerHTML = `<span class="incorrect">Incorrect. You said: ${cleaned}<br>Correct: ${expected}</span>`;
+          spellingBeeIncorrectWords.push({ word: expectedWord, typed: cleaned });
+        }
+
+        setTimeout(() => {
+          spellingBeeIndex++;
+          runSpellingBeeWord();
+        }, 3000);
+      };
+
+      recognition.onerror = (event) => {
+        statusEl.innerHTML = `<span class="incorrect">Error: ${event.error}</span>`;
+        setTimeout(() => {
+          spellingBeeIndex++;
+          runSpellingBeeWord();
+        }, 3000);
+      };
+
+      recognition.start();
+    }
+
     function startPractice() {
       if (words.length === 0) {
         alert("Please select an exam or load words first.");
@@ -805,37 +813,36 @@ function listenToSpelling(expectedWord, statusEl) {
     }
 
     function showSpellingBeeScore() {
-  const container = document.getElementById("trainer");
-  container.innerHTML = "";
+      const container = document.getElementById("trainer");
+      container.innerHTML = "";
 
-  const percentage = Math.round((spellingBeeCorrectCount / words.length) * 100);
+      const percentage = Math.round((spellingBeeCorrectCount / words.length) * 100);
 
-  let summary = `
-    <div class="word-box">
-      <h3>Spelling Bee Complete!</h3>
-      <p>You spelled ${spellingBeeCorrectCount} out of ${words.length} correctly (${percentage}%).</p>
-  `;
+      let summary = `
+        <div class="word-box">
+          <h3>Spelling Bee Complete!</h3>
+          <p>You spelled ${spellingBeeCorrectCount} out of ${words.length} correctly (${percentage}%).</p>
+      `;
 
-  if (spellingBeeIncorrectWords.length > 0) {
-    summary += `<h4>Incorrect Words:</h4><div class="review-section">`;
-    spellingBeeIncorrectWords.forEach(item => {
-      summary += `<div class="review-item">
-        <strong>${item.word}</strong> (You said: ${item.typed})
+      if (spellingBeeIncorrectWords.length > 0) {
+        summary += `<h4>Incorrect Words:</h4><div class="review-section">`;
+        spellingBeeIncorrectWords.forEach(item => {
+          summary += `<div class="review-item">
+            <strong>${item.word}</strong> (You said: ${item.typed})
+          </div>`;
+        });
+        summary += `</div>`;
+      }
+
+      summary += `
+        <button onclick="startSpellingBee()" class="btn">Restart Spelling Bee</button>
+        <button onclick="location.reload()" class="btn btn-secondary">Back to Menu</button>
       </div>`;
-    });
-    summary += `</div>`;
-  }
 
-  summary += `
-    <button onclick="startSpellingBee()" class="btn">Restart Spelling Bee</button>
-    <button onclick="location.reload()" class="btn btn-secondary">Back to Menu</button>
-  </div>`;
+      container.innerHTML = summary;
+    }
 
-  container.innerHTML = summary;
-     }
-  }
-
-   function resetSession() {
+    function resetSession() {
       currentWordIndex = 0;
       correctCount = 0;
       flaggedWords = [];
