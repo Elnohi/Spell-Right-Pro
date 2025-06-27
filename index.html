@@ -1,129 +1,875 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spell Right Pro</title>
-  <style>
-    /* [Previous CSS content remains exactly the same] */
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spell Right Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --white: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .logo {
+            width: 80px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+        }
+
+        .tagline {
+            color: var(--gray);
+            font-weight: 300;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            min-height: 24px;
+            transition: var(--transition);
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn i {
+            font-size: 0.9rem;
+        }
+
+        .btn-secondary {
+            background-color: var(--gray);
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: var(--dark);
+        }
+
+        .btn-success:hover {
+            background-color: #3aa8d8;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background-color: #e5177b;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background-color: var(--light-gray);
+            border-radius: 4px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .status {
+            display: block;
+            margin-top: 10px;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: var(--border-radius);
+        }
+
+        .correct {
+            background-color: rgba(76, 201, 240, 0.2);
+            color: #0a9396;
+        }
+
+        .incorrect {
+            background-color: rgba(247, 37, 133, 0.2);
+            color: var(--danger);
+        }
+
+        .word-display {
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--primary);
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background-color: var(--primary);
+            color: var(--white);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .file-upload-label:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .file-upload-wrapper input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 15px;
+            color: var(--primary);
+        }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .toggle-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .card {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode input,
+        body.dark-mode select,
+        body.dark-mode textarea {
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+            border-color: #444;
+        }
+
+        body.dark-mode .review-item {
+            background-color: #2d2d2d;
+        }
+
+        body.dark-mode label {
+            color: #e0e0e0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .file-upload-wrapper {
+                width: 100%;
+            }
+            
+            .file-upload-label {
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body>
-  <!-- [Previous HTML content remains exactly the same until the script section] -->
-  
-  <script>
-    // Initialize with empty word list
-    let oetWordList = []; // Fallback in case oet_word_list.js doesn't load
-    
-    // Main application object
-    const SpellRightApp = {
-      // App Variables
-      words: [],
-      userEmail: "",
-      currentAccent: "en-GB",
-      currentWordIndex: 0,
-      correctCount: 0,
-      flaggedWords: [],
-      incorrectWords: [],
-      previousWords: [],
-      mode: "",
-      spellingBeeCorrectCount: 0,
-      spellingBeeIncorrectWords: [],
-      storageKey: "spellrightpro-progress",
-      
-      // Initialize the app
-      init: function() {
-        // Dark Mode Toggle
-        const toggleButton = document.getElementById("modeToggle");
-        toggleButton.addEventListener("click", () => {
-          document.body.classList.toggle("dark-mode");
-        });
-        
-        // Initialize other event listeners
-        document.getElementById("userEmail").addEventListener("keypress", (e) => {
-          if (e.key === "Enter") this.loginUser();
-        });
-        
-        // Try to load OET words (fallback to empty array)
-        try {
-          if (typeof oetWordList !== 'undefined' && oetWordList.length) {
-            console.log("OET words loaded successfully");
-          } else {
-            oetWordList = ["sample", "words", "if", "loading", "failed"];
-            console.warn("Using fallback word list");
-          }
-        } catch (e) {
-          oetWordList = ["sample", "words", "if", "loading", "failed"];
-          console.error("Word list loading error:", e);
-        }
-      },
-      
-      // [All other functions remain the same but need to be modified to use 'this' instead of global variables]
-      // For example:
-      loginUser: function() {
-        this.userEmail = document.getElementById("userEmail").value.trim();
-        document.getElementById("loginStatus").textContent = this.userEmail
-          ? `Logged in as ${this.userEmail}`
-          : "";
-      },
-      
-      selectExamWords: function() {
-        const selectedExam = document.getElementById("examSelect").value;
-        if (selectedExam === "OET") {
-          this.words = [...oetWordList];
-          alert("OET word list loaded. Please start a mode.");
-        } else if (selectedExam === "SpellingBee") {
-          this.words = ["example", "banana", "language", "computer", "apple"];
-          alert("Spelling Bee sample list loaded. Starting Spelling Bee mode...");
-          this.startSpellingBee();
-        } else {
-          this.words = [];
-          document.getElementById("trainer").innerHTML =
-            "<p>No words loaded. Please select an exam or add custom words.</p>";
-        }
-      },
-      
-      // [Include all other functions here, converting them to methods]
-      // Example:
-      startPractice: function() {
-        if (this.words.length === 0) {
-          alert("Please select an exam or load words first.");
-          return;
-        }
-        this.mode = "practice";
-        this.loadProgress();
-        this.presentWord();
-      }
-      
-      // [Continue with all other functions...]
-    };
+    <div class="toggle-container">
+        <button id="modeToggle" class="btn btn-secondary">
+            <i class="fas fa-moon"></i> Dark Mode
+        </button>
+    </div>
 
-    // Initialize the app when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-      SpellRightApp.init();
-      
-      // Make app functions available globally (for HTML onclick handlers)
-      window.loginUser = () => SpellRightApp.loginUser();
-      window.changeAccent = () => SpellRightApp.changeAccent();
-      window.selectExamWords = () => SpellRightApp.selectExamWords();
-      window.startPractice = () => SpellRightApp.startPractice();
-      window.startTest = () => SpellRightApp.startTest();
-      window.addCustomWords = () => SpellRightApp.addCustomWords();
-      window.handleFileUpload = (e) => SpellRightApp.handleFileUpload(e);
-      window.saveWordList = () => SpellRightApp.saveWordList();
-      window.loadWordList = () => SpellRightApp.loadWordList();
-      window.clearWordList = () => SpellRightApp.clearWordList();
-    });
+    <div class="container">
+        <header>
+            <img src="logo.png" alt="Spell Right Pro Logo" class="logo">
+            <h1>Spell Right Pro</h1>
+            <p class="tagline" id="dynamicTagline">Elevate your spelling skills to perfection</p>
+        </header>
 
-    // PDF.js initialization
-    window.pdfjsLib = {
-      GlobalWorkerOptions: {}
-    };
-  </script>
-  
-  <!-- Load external scripts at the end -->
-  <script src="oet_word_list.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.0/mammoth.browser.min.js"></script>
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-user"></i> User Profile</h2>
+            <div class="form-group">
+                <label for="userEmail">Email Address</label>
+                <input type="email" id="userEmail" placeholder="Enter your email to save progress">
+            </div>
+            <button onclick="loginUser()" class="btn">
+                <i class="fas fa-sign-in-alt"></i> Login/Save Progress
+            </button>
+            <span id="loginStatus"></span>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-cog"></i> Settings</h2>
+            <div class="form-group">
+                <label for="accentSelect">Select Accent</label>
+                <select id="accentSelect">
+                    <option value="en-GB">British English</option>
+                    <option value="en-US">American English</option>
+                    <option value="en-AU">Australian English</option>
+                    <option value="en-CA">Canadian English</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="examSelect">Exam Preparation</label>
+                <select id="examSelect">
+                    <option value="">-- Select Exam --</option>
+                    <option value="OET">OET (Medical Terminology)</option>
+                    <option value="SpellingBee">Spelling Bee Challenge</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-play"></i> Start Training</h2>
+            <div class="controls">
+                <button onclick="startPractice()" class="btn">
+                    <i class="fas fa-book-open"></i> Practice Mode
+                </button>
+                <button onclick="startTest()" class="btn btn-success">
+                    <i class="fas fa-stopwatch"></i> Timed Test (24 Words)
+                </button>
+            </div>
+            <div id="progressContainer" class="progress-container" style="display: none;">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+        </div>
+
+        <div class="card" id="trainer">
+            <h2 class="card-title"><i class="fas fa-spell-check"></i> Word Trainer</h2>
+            <p>Select an exam or add custom words to begin your training session.</p>
+        </div>
+
+        <div class="card" id="scoreDisplay"></div>
+
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-plus-circle"></i> Custom Words</h2>
+            <div class="form-group">
+                <label for="wordInput">Add Multiple Words</label>
+                <textarea id="wordInput" placeholder="Enter words separated by commas, spaces, or line breaks"></textarea>
+            </div>
+            <div class="controls">
+                <button onclick="addCustomWords()" class="btn">
+                    <i class="fas fa-plus"></i> Add Words
+                </button>
+                <div class="file-upload-wrapper">
+                    <label class="file-upload-label">
+                        <i class="fas fa-file-upload"></i> Upload Word List
+                        <input type="file" id="fileUpload" accept=".txt,.pdf,.docx">
+                    </label>
+                </div>
+                <button onclick="saveWordList()" class="btn btn-success">
+                    <i class="fas fa-save"></i> Save List
+                </button>
+                <button onclick="loadWordList()" class="btn btn-outline">
+                    <i class="fas fa-folder-open"></i> Load List
+                </button>
+                <button onclick="clearWordList()" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> Clear
+                </button>
+            </div>
+            <div id="loadingIndicator" class="loading" style="display: none;">
+                <i class="fas fa-spinner"></i> Processing your file, please wait...
+            </div>
+        </div>
+
+        <a href="contact.html" id="contactBtn" class="btn" style="margin-top: 30px; display: block; text-align: center;">
+            <i class="fas fa-envelope"></i> Contact Our Support Team
+        </a>
+    </div>
+
+    <script>
+        // Fallback word list if oet_word_list.js fails to load
+        window.oetWordList = window.oetWordList || [
+            "medical", "terminology", "default", "words", 
+            "patient", "diagnosis", "treatment", "symptom",
+            "prescription", "allergy", "clinical", "examination"
+        ];
+
+        // Main application object
+        const SpellRightApp = {
+            // App state
+            words: [],
+            userEmail: "",
+            currentAccent: "en-GB",
+            currentWordIndex: 0,
+            correctCount: 0,
+            flaggedWords: [],
+            incorrectWords: [],
+            previousWords: [],
+            mode: "",
+            spellingBeeIndex: 0,
+            spellingBeeCorrectCount: 0,
+            spellingBeeIncorrectWords: [],
+            spellingBeeAutoContinue: false,
+            storageKey: "spellrightpro-progress",
+            
+            // Initialize the app
+            init: function() {
+                console.log("Initializing Spell Right Pro");
+                
+                // Dark Mode Toggle
+                const toggleButton = document.getElementById("modeToggle");
+                toggleButton.addEventListener("click", () => {
+                    document.body.classList.toggle("dark-mode");
+                    localStorage.setItem('darkMode', document.body.classList.contains("dark-mode") ? 'enabled' : 'disabled');
+                    this.updateToggleButton();
+                });
+                
+                // Set initial dark mode state
+                if (localStorage.getItem('darkMode') === 'enabled') {
+                    document.body.classList.add('dark-mode');
+                }
+                this.updateToggleButton();
+                
+                // Initialize event listeners
+                document.getElementById("accentSelect").addEventListener("change", (e) => {
+                    this.currentAccent = e.target.value;
+                    localStorage.setItem('accentPreference', this.currentAccent);
+                });
+                
+                // Load accent preference
+                const savedAccent = localStorage.getItem('accentPreference');
+                if (savedAccent) {
+                    document.getElementById('accentSelect').value = savedAccent;
+                    this.currentAccent = savedAccent;
+                }
+                
+                // Exam selection
+                document.getElementById("examSelect").addEventListener("change", (e) => {
+                    this.selectExamWords(e.target.value);
+                });
+                
+                // File upload
+                document.getElementById("fileUpload").addEventListener("change", (e) => {
+                    this.handleFileUpload(e);
+                });
+                
+                console.log("App initialized successfully");
+            },
+            
+            updateToggleButton: function() {
+                const button = document.getElementById("modeToggle");
+                if (document.body.classList.contains("dark-mode")) {
+                    button.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+                } else {
+                    button.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+                }
+            },
+            
+            updateTagline: function(selectedExam) {
+                const taglines = {
+                    "OET": "Master medical terminology with confidence",
+                    "SpellingBee": "Challenge yourself with spelling excellence",
+                    "default": "Elevate your spelling skills to perfection"
+                };
+                const taglineEl = document.getElementById("dynamicTagline");
+                taglineEl.textContent = taglines[selectedExam] || taglines["default"];
+                
+                // Animate the change
+                taglineEl.style.opacity = 0;
+                setTimeout(() => {
+                    taglineEl.style.opacity = 1;
+                }, 300);
+            },
+            
+            selectExamWords: function(selectedExam) {
+                console.log("Selected exam:", selectedExam);
+                this.updateTagline(selectedExam);
+                
+                if (selectedExam === "OET") {
+                    this.words = [...oetWordList];
+                    this.startPractice(); // Auto-start practice for OET
+                } else if (selectedExam === "SpellingBee") {
+                    this.words = ["example", "banana", "language", "computer", "apple"];
+                    this.startSpellingBee(); // Auto-start Spelling Bee
+                } else {
+                    this.words = [];
+                    this.updateTagline("default");
+                    document.getElementById("trainer").innerHTML = `
+                        <div class="card">
+                            <h2 class="card-title"><i class="fas fa-spell-check"></i> Word Trainer</h2>
+                            <p>Please select an exam or add custom words to begin.</p>
+                        </div>
+                    `;
+                }
+                
+                console.log("Words loaded:", this.words.length);
+            },
+            
+            loginUser: function() {
+                this.userEmail = document.getElementById("userEmail").value.trim();
+                const statusEl = document.getElementById("loginStatus");
+                
+                if (this.userEmail) {
+                    statusEl.textContent = `Logged in as ${this.userEmail}`;
+                    statusEl.className = "status correct";
+                } else {
+                    statusEl.textContent = "Please enter a valid email";
+                    statusEl.className = "status incorrect";
+                }
+            },
+            
+            startPractice: function() {
+                if (this.words.length === 0) {
+                    alert("Please select an exam or load words first.");
+                    return;
+                }
+                this.mode = "practice";
+                document.getElementById("progressContainer").style.display = "block";
+                this.loadProgress();
+                this.presentWord();
+            },
+            
+            startTest: function() {
+                if (this.words.length === 0) {
+                    alert("Please select an exam or load words first.");
+                    return;
+                }
+                this.words = this.shuffle([...this.words]).slice(0, 24);
+                this.currentWordIndex = 0;
+                this.correctCount = 0;
+                this.flaggedWords = [];
+                this.incorrectWords = [];
+                this.previousWords = [];
+                this.mode = "test";
+                document.getElementById("progressContainer").style.display = "block";
+                this.updateProgressBar();
+                this.presentWord();
+            },
+            
+            startSpellingBee: function() {
+                if (this.words.length === 0) {
+                    alert("Please add words or select an exam first.");
+                    return;
+                }
+                
+                this.spellingBeeIndex = 0;
+                this.spellingBeeCorrectCount = 0;
+                this.spellingBeeIncorrectWords = [];
+                this.spellingBeeAutoContinue = false;
+                
+                this.showSpellingBeeWord();
+            },
+            
+            showSpellingBeeWord: function() {
+                if (this.spellingBeeIndex >= this.words.length) {
+                    this.showSpellingBeeScore();
+                    return;
+                }
+
+                const word = typeof this.words[this.spellingBeeIndex] === 'string' 
+                    ? this.words[this.spellingBeeIndex] 
+                    : this.words[this.spellingBeeIndex].text;
+                    
+                const container = document.getElementById("trainer");
+                
+                container.innerHTML = `
+                    <div class="card">
+                        <h2 class="card-title"><i class="fas fa-spell-check"></i> Spelling Bee</h2>
+                        <div class="word-display">${word}</div>
+                        <div class="controls">
+                            <button onclick="SpellRightApp.speakCurrentWord(true)" class="btn">
+                                <i class="fas fa-volume-up"></i> ${this.spellingBeeIndex === 0 ? 'Start Spelling Bee' : 'Repeat Word'}
+                            </button>
+                        </div>
+                        <div id="spellingBeeStatus" class="status"></div>
+                        <small>Word ${this.spellingBeeIndex + 1} of ${this.words.length}</small>
+                    </div>
+                `;
+                
+                document.getElementById("progressContainer").style.display = "block";
+                this.updateProgressBar();
+                
+                // Auto-continue if not first word
+                if (this.spellingBeeAutoContinue && this.spellingBeeIndex > 0) {
+                    this.speakCurrentWord(false);
+                }
+            },
+            
+            speakCurrentWord: function(userInitiated) {
+                const word = typeof this.words[this.spellingBeeIndex] === 'string' 
+                    ? this.words[this.spellingBeeIndex] 
+                    : this.words[this.spellingBeeIndex].text;
+                    
+                try {
+                    const utterance = new SpeechSynthesisUtterance(word);
+                    utterance.lang = this.currentAccent;
+                    
+                    if (userInitiated) {
+                        this.spellingBeeAutoContinue = true;
+                    }
+                    
+                    utterance.onend = () => {
+                        if (this.spellingBeeAutoContinue) {
+                            this.listenToSpelling(word);
+                        }
+                    };
+                    
+                    speechSynthesis.speak(utterance);
+                } catch (e) {
+                    console.error("Speech error:", e);
+                    document.getElementById("spellingBeeStatus").innerHTML = 
+                        `<span class="incorrect">Error: Could not speak word</span>`;
+                }
+            },
+            
+            listenToSpelling: function(expectedWord) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const statusEl = document.getElementById("spellingBeeStatus");
+                
+                if (!SpeechRecognition) {
+                    statusEl.innerHTML = `<span class="incorrect">Speech Recognition not supported</span>`;
+                    return;
+                }
+
+                statusEl.innerHTML = `<span>Listening... Speak now</span>`;
+                
+                const recognition = new SpeechRecognition();
+                recognition.lang = this.currentAccent;
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                recognition.onresult = (event) => {
+                    let spoken = event.results[0][0].transcript;
+                    let cleaned = spoken.replace(/[^a-zA-Z]/g, "").toLowerCase();
+                    let expected = expectedWord.toLowerCase();
+
+                    if (cleaned === expected) {
+                        statusEl.innerHTML = `<span class="correct">Correct! You said: ${cleaned}</span>`;
+                        this.spellingBeeCorrectCount++;
+                    } else {
+                        statusEl.innerHTML = `
+                            <span class="incorrect">
+                                Incorrect. You said: ${cleaned}<br>
+                                Correct spelling: ${expectedWord}
+                            </span>`;
+                        this.spellingBeeIncorrectWords.push({ 
+                            word: expectedWord, 
+                            typed: cleaned 
+                        });
+                    }
+                    
+                    this.spellingBeeIndex++;
+                    this.updateProgressBar();
+                    
+                    // Auto-continue to next word after 2 seconds
+                    setTimeout(() => {
+                        if (this.spellingBeeIndex < this.words.length) {
+                            this.showSpellingBeeWord();
+                        } else {
+                            this.showSpellingBeeScore();
+                        }
+                    }, 2000);
+                };
+
+                recognition.onerror = (event) => {
+                    statusEl.innerHTML = `<span class="incorrect">Error: ${event.error}</span>`;
+                    // Allow manual continuation
+                    const container = document.getElementById("trainer");
+                    container.innerHTML += `
+                        <div class="controls" style="margin-top: 15px;">
+                            <button onclick="SpellRightApp.spellingBeeIndex++; SpellRightApp.showSpellingBeeWord()" class="btn">
+                                <i class="fas fa-forward"></i> Continue
+                            </button>
+                        </div>
+                    `;
+                };
+
+                recognition.start();
+            },
+            
+            showSpellingBeeScore: function() {
+                const container = document.getElementById("trainer");
+                const percentage = Math.round((this.spellingBeeCorrectCount / this.words.length) * 100);
+                
+                let summary = `
+                    <div class="card">
+                        <h2 class="card-title"><i class="fas fa-spell-check"></i> Spelling Bee Complete!</h2>
+                        <p>You spelled ${this.spellingBeeCorrectCount} out of ${this.words.length} correctly (${percentage}%)</p>
+                `;
+
+                if (this.spellingBeeIncorrectWords.length > 0) {
+                    summary += `<div class="review-section"><h3>Incorrect Words:</h3>`;
+                    this.spellingBeeIncorrectWords.forEach(item => {
+                        summary += `
+                            <div class="review-item">
+                                <strong>${item.word}</strong> (You said: ${item.typed})
+                            </div>
+                        `;
+                    });
+                    summary += `</div>`;
+                }
+
+                summary += `
+                    <div class="controls" style="margin-top: 20px;">
+                        <button onclick="SpellRightApp.startSpellingBee()" class="btn">
+                            <i class="fas fa-redo"></i> Try Again
+                        </button>
+                        <button onclick="location.reload()" class="btn btn-secondary">
+                            <i class="fas fa-home"></i> Return to Menu
+                        </button>
+                    </div>
+                    </div>
+                `;
+
+                container.innerHTML = summary;
+                document.getElementById("progressContainer").style.display = "none";
+            },
+            
+            // [Include other necessary functions like presentWord, handleFileUpload, etc.]
+            
+            shuffle: function(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            },
+            
+            updateProgressBar: function() {
+                const progress = this.mode === "SpellingBee" 
+                    ? (this.spellingBeeIndex / this.words.length) * 100
+                    : (this.currentWordIndex / this.words.length) * 100;
+                document.getElementById("progressBar").style.width = `${progress}%`;
+            },
+            
+            // [Add other utility functions as needed]
+        };
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            SpellRightApp.init();
+            
+            // Make app functions available globally
+            window.loginUser = () => SpellRightApp.loginUser();
+            window.startPractice = () => SpellRightApp.startPractice();
+            window.startTest = () => SpellRightApp.startTest();
+            window.startSpellingBee = () => SpellRightApp.startSpellingBee();
+            window.speakCurrentWord = (userInitiated) => SpellRightApp.speakCurrentWord(userInitiated);
+            window.addCustomWords = () => SpellRightApp.addCustomWords();
+            window.saveWordList = () => SpellRightApp.saveWordList();
+            window.loadWordList = () => SpellRightApp.loadWordList();
+            window.clearWordList = () => SpellRightApp.clearWordList();
+            
+            console.log("All functions bound successfully");
+        });
+
+        // Load external scripts with error handling
+        function loadScript(src, onSuccess, onError) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = () => {
+                    console.log(`Script loaded: ${src}`);
+                    if (onSuccess) onSuccess();
+                    resolve();
+                };
+                script.onerror = () => {
+                    console.error(`Error loading script: ${src}`);
+                    if (onError) onError();
+                    reject();
+                };
+                document.body.appendChild(script);
+            });
+        }
+
+        // Load scripts sequentially with error handling
+        (async function() {
+            try {
+                await loadScript('oet_word_list.js', 
+                    () => console.log("OET word list loaded"),
+                    () => console.warn("Using fallback word list"));
+                
+                await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js',
+                    () => console.log("PDF.js loaded"));
+                
+                await loadScript('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.0/mammoth.browser.min.js',
+                    () => console.log("Mammoth.js loaded"));
+                
+                console.log("All scripts loaded successfully");
+            } catch (error) {
+                console.error("Script loading error:", error);
+            }
+        })();
+    </script>
 </body>
 </html>
