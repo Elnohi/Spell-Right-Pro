@@ -261,17 +261,10 @@
 }
 
 .file-upload-wrapper {
-  width: 100%;
-}
-
-.file-upload-wrapper input[type="file"] {
-  position: absolute;
-  left: 0;
-  top: 0;
-  opacity: 0;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
+  position: relative;
+  display: inline-block;
+  width: auto;
+  max-width: 220px; /* Match typical button width */
 }
 
 .file-upload-label {
@@ -285,10 +278,11 @@
   cursor: pointer;
   transition: var(--transition);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: 100%;
+  max-width: 220px; /* Match button width */
 }
 
     .file-upload-label:hover {
