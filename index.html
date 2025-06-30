@@ -257,11 +257,22 @@
   flex-wrap: wrap;
   gap: 1rem;
   margin: 1rem 0;
-  align-items: stretch;
+  align-items: center;
   justify-content: flex-start;
+  width: 100%;
 }
 
-    
+.controls > * {
+  flex: 1 1 200px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+@media (max-width: 768px) {
+  .controls > * {
+    flex: 1 1 100%;
+  }
+}
+
     /* File Upload Styles - Updated for consistent sizing */
     .file-upload-wrapper {
       position: relative;
@@ -537,7 +548,7 @@
           </button>
           <div class="file-upload-wrapper">
             <label class="file-upload-label">
-              <span>📁</span> Upload
+              <span>📁</span> Upload File
               <input type="file" id="fileUpload" accept=".txt,.pdf,.docx" onchange="handleFileUpload(event)">
             </label>
           </div>
