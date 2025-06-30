@@ -241,7 +241,7 @@
       box-shadow: var(--box-shadow-lg);
     }
     
-    /* Word Box */
+    /* Word Box - Updated for mobile */
     .word-box {
       background: var(--card-bg);
       padding: 1.5rem;
@@ -302,7 +302,7 @@
       align-items: center;
     }
     
-    /* File Upload Styles - Adjusted to match screenshot */
+    /* File Upload Styles */
     .file-upload-wrapper {
       position: relative;
       display: inline-block;
@@ -526,7 +526,7 @@
       color: white;
     }
     
-    /* Responsive Adjustments */
+    /* Mobile-specific styles for practice interface */
     @media (max-width: 768px) {
       .container {
         padding: 1.25rem;
@@ -540,6 +540,41 @@
         grid-template-columns: 1fr;
       }
       
+      /* Compact practice interface */
+      .word-box {
+        padding: 1rem;
+      }
+      
+      .word-box h3 {
+        margin-bottom: 0.5rem;
+      }
+      
+      .word-box .controls {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .word-box .status {
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+      
+      .word-box .btn {
+        width: 100%;
+        padding: 0.6rem;
+      }
+      
+      .word-box input[type="text"] {
+        margin: 0.5rem 0;
+        padding: 0.75rem;
+      }
+      
+      .word-box .btn + input,
+      .word-box input + .btn {
+        margin-top: 0.5rem;
+      }
+      
+      /* Adjust other controls */
       .controls {
         flex-direction: column;
         align-items: stretch;
@@ -932,22 +967,24 @@
         }
       }
 
-      // Build the UI
-      controlsDiv.appendChild(backBtn);
-      controlsDiv.appendChild(nextBtn);
-
+      // Build the UI - optimized for mobile
       box.appendChild(progressContainer);
       box.appendChild(title);
       box.appendChild(speakBtn);
-      box.appendChild(document.createElement("br"));
       box.appendChild(input);
       box.appendChild(checkBtn);
+      box.appendChild(status); // Status appears right below check button
       box.appendChild(flagBtn);
-      box.appendChild(controlsDiv);
-      box.appendChild(status);
+      
+      // Navigation controls in their own row
+      const navControls = document.createElement("div");
+      navControls.className = "controls";
+      navControls.appendChild(backBtn);
+      navControls.appendChild(nextBtn);
+      box.appendChild(navControls);
 
       document.getElementById("trainer").appendChild(box);
-      setTimeout(() => speak(word), 500); // Slight delay for better UX
+      setTimeout(() => speak(word), 500);
       input.focus();
     }
 
