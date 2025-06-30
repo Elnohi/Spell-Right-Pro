@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-0YSR05E7NR"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-0YSR05E7NR');
-</script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0YSR05E7NR"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-0YSR05E7NR');
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Spell Right Pro</title>
@@ -17,65 +16,118 @@
   <!-- Add libraries for file parsing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.0/mammoth.browser.min.js"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary-color: #007bff;
-      --secondary-color: #6c757d;
-      --success-color: #28a745;
-      --danger-color: #dc3545;
+      --primary-color: #4361ee;
+      --primary-light: #e0e7ff;
+      --secondary-color: #3f37c9;
+      --success-color: #4cc9f0;
+      --danger-color: #f72585;
+      --warning-color: #f8961e;
       --light-bg: #f8f9fa;
-      --dark-bg: #343a40;
+      --dark-bg: #1a1a2e;
+      --card-bg: #ffffff;
+      --text-color: #2b2d42;
+      --text-light: #8d99ae;
+      --border-radius: 12px;
+      --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      --transition: all 0.3s ease;
     }
     
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: 'Poppins', sans-serif;
       line-height: 1.6;
-      color: #333;
-      background: linear-gradient(to right, #e0eafc, #cfdef3);
+      color: var(--text-color);
+      background-color: var(--light-bg);
       margin: 0;
-      padding: 20px;
+      padding: 0;
       min-height: 100vh;
+    }
+    
+    body.dark-mode {
+      --light-bg: #0f0f1a;
+      --dark-bg: #121212;
+      --card-bg: #1e1e2e;
+      --text-color: #f8f9fa;
+      --text-light: #a8a8c0;
+      --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      background: linear-gradient(135deg, #0f0f1a 0%, #121212 100%);
     }
     
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 20px;
+      padding: 2rem;
     }
     
     header {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 2.5rem;
+      position: relative;
     }
     
     img.logo {
-      max-width: 150px;
+      max-width: 180px;
       height: auto;
-      margin-bottom: 20px;
+      margin-bottom: 1.5rem;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
     }
     
     h1 {
       color: var(--primary-color);
-      margin-bottom: 10px;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+      font-size: 2.5rem;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    h2 {
+      color: var(--text-color);
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+    }
+    
+    h3 {
+      color: var(--text-color);
+      font-weight: 500;
+      margin-bottom: 1rem;
     }
     
     /* Button Styles */
     .btn {
-      display: inline-block;
-      padding: 10px 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1.5rem;
       background-color: var(--primary-color);
       color: white;
       text-decoration: none;
-      border-radius: 5px;
+      border-radius: var(--border-radius);
       border: none;
       cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s;
-      margin: 5px;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: var(--transition);
+      margin: 0.5rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      min-width: 120px;
     }
     
     .btn:hover {
-      background-color: #0056b3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
     }
     
     .btn-secondary {
@@ -90,122 +142,147 @@
       background-color: var(--danger-color);
     }
     
+    .btn-warning {
+      background-color: var(--warning-color);
+    }
+    
+    .btn-outline {
+      background-color: transparent;
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+    }
+    
+    .btn-outline:hover {
+      background-color: var(--primary-light);
+    }
+    
     /* Form Elements */
     input, select, textarea {
-      padding: 10px;
+      padding: 0.75rem 1rem;
       border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 16px;
-      margin: 5px 0;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      margin: 0.5rem 0;
+      transition: var(--transition);
+      width: 100%;
+      max-width: 100%;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
     }
     
     input[type="text"],
     input[type="email"] {
-      width: 250px;
+      width: 100%;
+      max-width: 300px;
     }
     
     textarea {
-      width: 90%;
-      min-height: 100px;
+      width: 100%;
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    /* Card Styles */
+    .card {
+      background-color: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      margin-bottom: 1.5rem;
+      transition: var(--transition);
+    }
+    
+    .card:hover {
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
     }
     
     /* Word Box */
     .word-box {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      margin-bottom: 2rem;
+      position: relative;
     }
     
     .flagged {
-      background-color: #fff3cd;
+      background-color: rgba(248, 150, 30, 0.1);
+      border-left: 4px solid var(--warning-color);
     }
     
     /* Review Section */
     .review-section {
-      background: #f8d7da;
-      padding: 15px;
-      border-radius: 10px;
-      margin-top: 20px;
+      background: rgba(247, 37, 133, 0.1);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      margin-top: 2rem;
+      border-left: 4px solid var(--danger-color);
     }
     
     .review-item {
-      margin: 10px 0;
-      padding: 10px;
-      background: white;
-      border-radius: 5px;
-    }
-    
-    /* Dark Mode */
-    body.dark-mode {
-      background: linear-gradient(to right, #2c3e50, #4ca1af);
-      color: white;
-    }
-    
-    body.dark-mode .word-box,
-    body.dark-mode .review-item {
-      background: #34495e;
-      color: white;
-    }
-    
-    body.dark-mode .review-section {
-      background: #7f8c8d;
+      margin: 1rem 0;
+      padding: 1rem;
+      background: var(--card-bg);
+      border-radius: calc(var(--border-radius) - 4px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
     
     /* Dark Mode Toggle */
     .toggle-container {
       position: fixed;
-      top: 20px;
-      right: 20px;
+      top: 1.5rem;
+      right: 1.5rem;
       z-index: 1000;
-    }
-    
-    /* Contact Button */
-    #contactBtn {
-      margin: 40px auto 0;
-      display: block;
-      width: 200px;
-      text-align: center;
     }
     
     /* Score Display */
     #scoreDisplay {
-      margin: 20px 0;
-      font-weight: bold;
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
+      margin: 2rem 0;
+      font-weight: 600;
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
     }
     
     /* Controls */
     .controls {
       display: flex;
-      justify-content: center;
       flex-wrap: wrap;
-      gap: 10px;
-      margin: 10px 0;
+      gap: 0.75rem;
+      margin: 1rem 0;
+      align-items: center;
     }
     
     /* Status Messages */
     .status {
       display: block;
-      margin-top: 10px;
-      font-weight: bold;
+      margin-top: 1rem;
+      font-weight: 500;
+      padding: 0.75rem;
+      border-radius: calc(var(--border-radius) - 4px);
     }
     
     .correct {
       color: var(--success-color);
+      background-color: rgba(76, 201, 240, 0.1);
     }
     
     .incorrect {
       color: var(--danger-color);
+      background-color: rgba(247, 37, 133, 0.1);
     }
     
     /* File Upload Styles */
     .file-upload-wrapper {
       position: relative;
       display: inline-block;
+      width: 100%;
     }
     
     .file-upload-wrapper input[type="file"] {
@@ -219,93 +296,303 @@
     }
     
     .file-upload-label {
-      display: inline-block;
-      padding: 10px 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1.5rem;
       background-color: var(--primary-color);
       color: white;
-      border-radius: 5px;
+      border-radius: var(--border-radius);
       cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 120px;
     }
     
     .file-upload-label:hover {
-      background-color: #0056b3;
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     }
     
     /* Loading Indicator */
     .loading {
       display: none;
-      margin: 10px 0;
+      margin: 1rem 0;
       color: var(--primary-color);
+      text-align: center;
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      background-color: rgba(67, 97, 238, 0.1);
+    }
+    
+    /* Progress Bar */
+    .progress-container {
+      width: 100%;
+      background-color: #e0e0e0;
+      border-radius: 8px;
+      margin: 1rem 0;
+      overflow: hidden;
+    }
+    
+    .progress-bar {
+      height: 8px;
+      background-color: var(--primary-color);
+      border-radius: 8px;
+      transition: width 0.3s ease;
+    }
+    
+    body.dark-mode .progress-container {
+      background-color: #2d2d42;
+    }
+    
+    /* Section Styling */
+    .section {
+      margin-bottom: 2.5rem;
+    }
+    
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    /* Form Group */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+    
+    /* Grid Layout */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    /* Footer */
+    footer {
+      margin-top: 4rem;
+      background: var(--card-bg);
+      padding: 2rem;
+      text-align: center;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+    }
+    
+    footer p {
+      margin-bottom: 1rem;
+      color: var(--text-light);
+    }
+    
+    .contact-form {
+      display: inline-block;
+      max-width: 400px;
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      width: 100%;
+    }
+    
+    .contact-form label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      text-align: left;
+    }
+    
+    .copyright {
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      color: var(--text-light);
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1.5rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .controls {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .btn, .file-upload-label {
+        width: 100%;
+        margin: 0.25rem 0;
+      }
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+    
+    /* Badge */
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      background-color: var(--primary-light);
+      color: var(--primary-color);
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+    
+    body.dark-mode .badge {
+      background-color: rgba(67, 97, 238, 0.2);
     }
   </style>
 </head>
 <body>
   <!-- Dark Mode Toggle -->
   <div class="toggle-container">
-    <button id="modeToggle" class="btn btn-secondary">Toggle Dark Mode</button>
+    <button id="modeToggle" class="btn btn-secondary">
+      <span id="modeIcon">🌙</span> Toggle Mode
+    </button>
   </div>
 
   <div class="container">
     <header>
       <img src="logo.png" alt="Spell Right Pro Logo" class="logo">
       <h1>Spell Right Pro</h1>
+      <p>Master medical terminology with confidence</p>
     </header>
 
-    <div id="loginSection">
-      <label>Email: <input type="email" id="userEmail"></label>
-      <button onclick="loginUser()" class="btn">Login</button>
-      <span id="loginStatus"></span>
+    <div class="grid">
+      <div class="card">
+        <div class="form-group">
+          <label for="userEmail">Email</label>
+          <input type="email" id="userEmail" placeholder="your@email.com">
+        </div>
+        <button onclick="loginUser()" class="btn">Login / Register</button>
+        <span id="loginStatus" class="status"></span>
+      </div>
+
+      <div class="card">
+        <div class="form-group">
+          <label for="accentSelect">Accent</label>
+          <select id="accentSelect" onchange="changeAccent()">
+            <option value="en-GB">British English</option>
+            <option value="en-US">American English</option>
+            <option value="en-CA">Canadian English</option>
+            <option value="en-AU">Australian English</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="form-group">
+          <label for="examSelect">Exam Selection</label>
+          <select id="examSelect" onchange="selectExamWords()">
+            <option value="">-- Select Exam --</option>
+            <option value="OET">OET (Occupational English Test)</option>
+          </select>
+        </div>
+      </div>
     </div>
 
-    <div id="accentSection">
-      <label>Accent:
-        <select id="accentSelect" onchange="changeAccent()">
-          <option value="en-GB">British</option>
-          <option value="en-US">American</option>
-          <option value="en-CA">Canadian</option>
-          <option value="en-AU">Australian</option>
-        </select>
-      </label>
+    <div class="section">
+      <h2 class="section-title">Practice Modes</h2>
+      <div class="controls">
+        <button onclick="startPractice()" class="btn btn-success">
+          <span>📚</span> Practice Mode
+        </button>
+        <button onclick="startTest()" class="btn btn-secondary">
+          <span>✏️</span> Test Yourself (24 Words)
+        </button>
+      </div>
     </div>
 
-    <div id="examSection">
-      <label>Select Exam:
-        <select id="examSelect" onchange="selectExamWords()">
-          <option value="">-- None --</option>
-          <option value="OET">OET</option>
-        </select>
-      </label>
-    </div>
-
-    <div class="controls">
-      <button onclick="startPractice()" class="btn">Practice Mode</button>
-      <button onclick="startTest()" class="btn">Test Yourself (24 Words)</button>
-    </div>
-
-    <div id="trainer"></div>
+    <div id="trainer" class="fade-in"></div>
     <div id="scoreDisplay"></div>
 
-    <div>
-      <h3>Add Custom Words</h3>
-      <textarea id="wordInput" placeholder="Enter words separated by commas or line breaks..."></textarea>
-      <div class="controls">
-        <button onclick="addCustomWords()" class="btn">Add Words</button>
-        <div class="file-upload-wrapper">
-          <label class="file-upload-label">
-            Upload File
-            <input type="file" id="fileUpload" accept=".txt,.pdf,.docx" onchange="handleFileUpload(event)">
-          </label>
+    <div class="section">
+      <h2 class="section-title">Custom Words <span class="badge">Beta</span></h2>
+      <div class="card">
+        <div class="form-group">
+          <label for="wordInput">Add words (separate by commas or line breaks)</label>
+          <textarea id="wordInput" placeholder="e.g., hypertension, diabetes, stethoscope"></textarea>
         </div>
-        <button onclick="saveWordList()" class="btn btn-success">Save List</button>
-        <button onclick="loadWordList()" class="btn">Load List</button>
-        <button onclick="clearWordList()" class="btn btn-danger">Clear</button>
+        
+        <div class="controls">
+          <button onclick="addCustomWords()" class="btn">
+            <span>➕</span> Add Words
+          </button>
+          <div style="display: inline-block; width: 200px;">
+            <div class="file-upload-wrapper">
+              <label class="file-upload-label">
+                <span>📁</span> Upload File
+                <input type="file" id="fileUpload" accept=".txt,.pdf,.docx" onchange="handleFileUpload(event)">
+              </label>
+            </div>
+          </div>
+          <button onclick="saveWordList()" class="btn btn-success">
+            <span>💾</span> Save List
+          </button>
+          <button onclick="loadWordList()" class="btn">
+            <span>📂</span> Load List
+          </button>
+          <button onclick="clearWordList()" class="btn btn-danger">
+            <span>🗑️</span> Clear
+          </button>
+        </div>
+        <div id="loadingIndicator" class="loading">
+          <div>Processing your file...</div>
+          <div class="progress-container">
+            <div class="progress-bar" style="width: 0%"></div>
+          </div>
+        </div>
       </div>
-      <div id="loadingIndicator" class="loading">Processing file, please wait...</div>
     </div>
-
-    <!-- Updated Contact Button with proper linking -->
-    
   </div>
+
+  <footer>
+    <p>Need help or have questions? Contact our support team</p>
+    <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="contact-form">
+      <input type="hidden" name="form-name" value="contact" />
+      <p style="display:none;"><label>Don't fill this out: <input name="bot-field" /></label></p>
+      <div class="form-group">
+        <label for="contact-email">Email</label>
+        <input type="email" id="contact-email" name="email" required>
+      </div>
+      <div class="form-group">
+        <label for="contact-message">Message</label>
+        <textarea id="contact-message" name="message" rows="3" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-success" style="width:100%;">
+        <span>✉️</span> Send Message
+      </button>
+    </form>
+    <p class="copyright">© 2025 Spell Right Pro. All rights reserved.</p>
+  </footer>
 
   <script>
     // Initialize PDF.js worker
@@ -313,8 +600,10 @@
 
     // Dark Mode Toggle
     const toggleButton = document.getElementById("modeToggle");
+    const modeIcon = document.getElementById("modeIcon");
     toggleButton.addEventListener("click", () => {
       document.body.classList.toggle("dark-mode");
+      modeIcon.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
     });
 
     // App Variables
@@ -332,9 +621,13 @@
     // Core Functions
     function loginUser() {
       userEmail = document.getElementById("userEmail").value.trim();
-      document.getElementById("loginStatus").textContent = userEmail
-        ? `Logged in as ${userEmail}`
-        : "";
+      if (userEmail) {
+        document.getElementById("loginStatus").textContent = `Logged in as ${userEmail}`;
+        document.getElementById("loginStatus").className = "status correct";
+      } else {
+        document.getElementById("loginStatus").textContent = "Please enter a valid email";
+        document.getElementById("loginStatus").className = "status incorrect";
+      }
     }
 
     function changeAccent() {
@@ -345,17 +638,17 @@
       const selectedExam = document.getElementById("examSelect").value;
       if (selectedExam === "OET") {
         words = [...oetWordList];
-        alert("OET word list loaded. Please start a mode.");
+        showNotification("OET word list loaded. Select a practice mode to begin.");
       } else {
         words = [];
         document.getElementById("trainer").innerHTML = 
-          "<p>No words loaded. Please select an exam or add custom words.</p>";
+          `<div class="card"><p>No words loaded. Please select an exam or add custom words.</p></div>`;
       }
     }
 
     function startPractice() {
       if (words.length === 0) {
-        alert("Please select an exam or load words first.");
+        showNotification("Please select an exam or load words first.", "error");
         return;
       }
       mode = "practice";
@@ -365,7 +658,7 @@
 
     function startTest() {
       if (words.length === 0) {
-        alert("Please select an exam or load words first.");
+        showNotification("Please select an exam or load words first.", "error");
         return;
       }
       words = shuffle([...words]).slice(0, 24);
@@ -389,6 +682,7 @@
     function speak(text) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = currentAccent;
+      utterance.rate = 0.9;
       speechSynthesis.speak(utterance);
     }
 
@@ -400,17 +694,25 @@
       const word = words[currentWordIndex];
 
       const box = document.createElement("div");
-      box.className = "word-box";
+      box.className = "word-box fade-in";
       if (flaggedWords.includes(currentWordIndex)) {
         box.classList.add("flagged");
       }
+
+      // Progress indicator
+      const progressContainer = document.createElement("div");
+      progressContainer.className = "progress-container";
+      const progressBar = document.createElement("div");
+      progressBar.className = "progress-bar";
+      progressBar.style.width = `${(currentWordIndex / words.length) * 100}%`;
+      progressContainer.appendChild(progressBar);
 
       const title = document.createElement("h3");
       title.textContent = `Word ${currentWordIndex + 1} of ${words.length}`;
 
       const speakBtn = document.createElement("button");
       speakBtn.className = "btn";
-      speakBtn.textContent = "Speak";
+      speakBtn.innerHTML = '<span>🔊</span> Speak';
       speakBtn.onclick = () => speak(word);
 
       const input = document.createElement("input");
@@ -421,16 +723,16 @@
       });
 
       const checkBtn = document.createElement("button");
-      checkBtn.className = "btn";
-      checkBtn.textContent = "Check";
+      checkBtn.className = "btn btn-success";
+      checkBtn.innerHTML = '<span>✓</span> Check';
       checkBtn.onclick = checkAnswer;
 
       const flagBtn = document.createElement("button");
       flagBtn.className = "btn " + 
-        (flaggedWords.includes(currentWordIndex) ? "btn-secondary" : "");
-      flagBtn.textContent = flaggedWords.includes(currentWordIndex)
-        ? "Unflag"
-        : "Flag";
+        (flaggedWords.includes(currentWordIndex) ? "btn-warning" : "btn-outline");
+      flagBtn.innerHTML = flaggedWords.includes(currentWordIndex)
+        ? '<span>🏴</span> Unflag'
+        : '<span>🚩</span> Flag';
       flagBtn.onclick = toggleFlag;
 
       const controlsDiv = document.createElement("div");
@@ -438,13 +740,13 @@
 
       const backBtn = document.createElement("button");
       backBtn.className = "btn";
-      backBtn.textContent = "Back";
+      backBtn.innerHTML = '<span>←</span> Back';
       backBtn.disabled = previousWords.length === 0;
       backBtn.onclick = goBack;
 
       const nextBtn = document.createElement("button");
       nextBtn.className = "btn";
-      nextBtn.textContent = "Next";
+      nextBtn.innerHTML = '<span>→</span> Next';
       nextBtn.onclick = goNext;
 
       const status = document.createElement("span");
@@ -456,7 +758,7 @@
         previousWords.push(currentWordIndex);
 
         if (typed === expected) {
-          status.textContent = "Correct!";
+          status.textContent = "Correct! Well done!";
           status.className = "status correct";
           correctCount++;
         } else {
@@ -473,11 +775,13 @@
         const index = flaggedWords.indexOf(currentWordIndex);
         if (index === -1) {
           flaggedWords.push(currentWordIndex);
-          flagBtn.textContent = "Unflag";
+          flagBtn.innerHTML = '<span>🏴</span> Unflag';
+          flagBtn.className = "btn btn-warning";
           box.classList.add("flagged");
         } else {
           flaggedWords.splice(index, 1);
-          flagBtn.textContent = "Flag";
+          flagBtn.innerHTML = '<span>🚩</span> Flag';
+          flagBtn.className = "btn btn-outline";
           box.classList.remove("flagged");
         }
         saveProgress();
@@ -513,6 +817,7 @@
       controlsDiv.appendChild(backBtn);
       controlsDiv.appendChild(nextBtn);
 
+      box.appendChild(progressContainer);
       box.appendChild(title);
       box.appendChild(speakBtn);
       box.appendChild(document.createElement("br"));
@@ -523,8 +828,8 @@
       box.appendChild(status);
 
       document.getElementById("trainer").appendChild(box);
-      speak(word);
-      input.focus(); // Automatically focuses the input field after word is spoken
+      setTimeout(() => speak(word), 500); // Slight delay for better UX
+      input.focus();
     }
 
     function showScore() {
@@ -532,13 +837,16 @@
       const percentage = Math.round((correctCount / words.length) * 100);
       
       let summary = `
-        <div class="word-box">
-          <h3>Test Complete!</h3>
+        <div class="card fade-in">
+          <h2>Test Complete!</h2>
           <p>You scored ${correctCount} out of ${words.length} (${percentage}%)</p>
+          <div class="progress-container">
+            <div class="progress-bar" style="width: ${percentage}%"></div>
+          </div>
       `;
 
       if (incorrectWords.length > 0) {
-        summary += `<h4>Incorrect Words:</h4><div class="review-section">`;
+        summary += `<h3>Words to Review</h3><div class="review-section">`;
         incorrectWords.forEach(item => {
           summary += `<div class="review-item">
             <strong>${item.word}</strong> (You wrote: ${item.typed})
@@ -548,7 +856,7 @@
       }
 
       if (flaggedWords.length > 0) {
-        summary += `<h4>Flagged Words:</h4><div class="review-section">`;
+        summary += `<h3>Flagged Words</h3><div class="review-section">`;
         flaggedWords.forEach(index => {
           summary += `<div class="review-item">${words[index]}</div>`;
         });
@@ -556,8 +864,8 @@
       }
 
       summary += `
-        <button onclick="location.reload()" class="btn">
-          Start New Session
+        <button onclick="location.reload()" class="btn" style="margin-top: 1.5rem;">
+          <span>🔄</span> Start New Session
         </button>
       </div>`;
 
@@ -595,14 +903,21 @@
 
     function addCustomWords() {
       const input = document.getElementById("wordInput").value.trim();
-      if (!input) return;
+      if (!input) {
+        showNotification("Please enter some words first.", "error");
+        return;
+      }
       
       const newWords = input.split(/[\n,]+/).map(w => w.trim()).filter(Boolean);
-      if (newWords.length === 0) return;
+      if (newWords.length === 0) {
+        showNotification("No valid words found in input.", "error");
+        return;
+      }
       
       words = newWords;
       document.getElementById("wordInput").value = "";
       resetSession();
+      showNotification(`${newWords.length} words added successfully!`, "success");
       presentWord();
     }
 
@@ -611,7 +926,9 @@
       if (!file) return;
       
       const loadingIndicator = document.getElementById("loadingIndicator");
+      const progressBar = loadingIndicator.querySelector(".progress-bar");
       loadingIndicator.style.display = "block";
+      progressBar.style.width = "30%";
       
       try {
         const fileType = file.name.split('.').pop().toLowerCase();
@@ -619,10 +936,13 @@
         
         if (fileType === "txt") {
           textContent = await readTextFile(file);
+          progressBar.style.width = "70%";
         } else if (fileType === "pdf") {
           textContent = await readPDFFile(file);
+          progressBar.style.width = "70%";
         } else if (fileType === "docx") {
           textContent = await readDocxFile(file);
+          progressBar.style.width = "70%";
         } else {
           throw new Error("Unsupported file type");
         }
@@ -634,12 +954,16 @@
         
         words = newWords;
         resetSession();
-        presentWord();
+        progressBar.style.width = "100%";
+        setTimeout(() => {
+          loadingIndicator.style.display = "none";
+          showNotification(`${newWords.length} words loaded from file!`, "success");
+          presentWord();
+        }, 500);
       } catch (error) {
-        alert(`Error processing file: ${error.message}`);
-      } finally {
         loadingIndicator.style.display = "none";
-        event.target.value = ""; // Reset file input
+        showNotification(`Error: ${error.message}`, "error");
+        event.target.value = "";
       }
     }
 
@@ -692,20 +1016,27 @@
     }
 
     function saveWordList() {
-      if (!userEmail) return alert("Please login to save.");
+      if (!userEmail) {
+        showNotification("Please login to save your word list.", "error");
+        return;
+      }
       localStorage.setItem(`spellright-list-${userEmail}`, JSON.stringify(words));
-      alert("Word list saved!");
+      showNotification("Word list saved successfully!", "success");
     }
 
     function loadWordList() {
-      if (!userEmail) return alert("Please login to load.");
+      if (!userEmail) {
+        showNotification("Please login to load your word list.", "error");
+        return;
+      }
       const saved = localStorage.getItem(`spellright-list-${userEmail}`);
       if (saved) {
         words = JSON.parse(saved);
         resetSession();
+        showNotification("Word list loaded successfully!", "success");
         presentWord();
       } else {
-        alert("No saved list found for this email.");
+        showNotification("No saved list found for this email.", "error");
       }
     }
 
@@ -713,8 +1044,9 @@
       if (confirm("Are you sure you want to clear all words?")) {
         words = [];
         document.getElementById("trainer").innerHTML = 
-          "<p>Word list cleared. Add new words or select an exam.</p>";
+          `<div class="card"><p>Word list cleared. Add new words or select an exam.</p></div>`;
         document.getElementById("scoreDisplay").innerHTML = "";
+        showNotification("Word list cleared.", "success");
       }
     }
 
@@ -725,25 +1057,27 @@
       incorrectWords = [];
       previousWords = [];
     }
+
+    function showNotification(message, type = "info") {
+      const notification = document.createElement("div");
+      notification.className = `status ${type === "error" ? "incorrect" : "correct"}`;
+      notification.textContent = message;
+      notification.style.position = "fixed";
+      notification.style.bottom = "20px";
+      notification.style.right = "20px";
+      notification.style.zIndex = "1000";
+      notification.style.padding = "1rem";
+      notification.style.borderRadius = "var(--border-radius)";
+      notification.style.boxShadow = "var(--box-shadow)";
+      notification.style.animation = "fadeIn 0.3s ease-out";
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.animation = "fadeIn 0.3s ease-out reverse";
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
   </script>
-
-<footer style="margin-top:60px; background:#f0f4f8; padding:20px; text-align:center; border-top:1px solid #ccc;">
-  <p style="margin-bottom:10px;">For inquiries, please use the form below:</p>
-  <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" style="display:inline-block; max-width:320px; background:#fff; padding:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
-    <input type="hidden" name="form-name" value="contact" />
-    <p style="display:none;"><label>Don’t fill this out: <input name="bot-field" /></label></p>
-    <label style="display:block; margin-bottom:10px;">
-      Email:<br>
-      <input type="email" name="email" required style="width:100%; padding:8px;">
-    </label>
-    <label style="display:block; margin-bottom:10px;">
-      Message:<br>
-      <textarea name="message" rows="3" required style="width:100%; padding:8px;"></textarea>
-    </label>
-    <button type="submit" class="btn btn-success" style="width:100%;">Send Message</button>
-  </form>
-  <p style="margin-top:15px; font-size:0.9em;">&copy; 2025 Spell Right Pro</p>
-</footer>
-
 </body>
 </html>
