@@ -121,18 +121,18 @@
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
-      padding: 0.75rem 1.25rem;
+      padding: 0.65rem 1.15rem;
       background-color: var(--primary-color);
       color: white;
       text-decoration: none;
       border-radius: var(--border-radius-sm);
       border: none;
       cursor: pointer;
-      font-size: 0.9375rem;
+      font-size: 0.9rem;
       font-weight: 500;
       transition: var(--transition);
       box-shadow: var(--box-shadow);
-      min-width: 140px;
+      min-width: 120px;
       max-width: 100%;
     }
     
@@ -216,9 +216,10 @@
     }
     
     textarea {
-      width: 90%;
+      width: 100%;
       min-height: 120px;
       resize: vertical;
+      font-family: inherit;
     }
     
     /* Card Styles */
@@ -296,17 +297,17 @@
     .controls {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.75rem;
+      gap: 0.5rem;
       margin: 1rem 0;
       align-items: center;
     }
     
-    /* File Upload Styles */
+    /* File Upload Styles - Adjusted to match screenshot */
     .file-upload-wrapper {
       position: relative;
       display: inline-block;
-      min-width: 140px;
-      max-width: 100%;
+      width: auto;
+      min-width: 120px;
     }
     
     .file-upload-wrapper input[type="file"] {
@@ -324,19 +325,17 @@
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
-      padding: 0.75rem 1.25rem;
+      padding: 0.65rem 1.15rem;
       background-color: var(--primary-color);
       color: white;
       border-radius: var(--border-radius-sm);
       cursor: pointer;
       transition: var(--transition);
       box-shadow: var(--box-shadow);
-      width: 100%;
       white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      font-size: 0.9375rem;
+      font-size: 0.9rem;
       font-weight: 500;
+      width: 100%;
     }
     
     .file-upload-label:hover {
