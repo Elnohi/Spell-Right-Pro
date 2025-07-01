@@ -178,7 +178,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.0/mammoth.browser.min.js"></script>
   <script>
-    const oetWordList = ["consult", "diagnosis", "infection", "treatment", "prescription"];
+    <script src="oet_word_list.js"></script>
   </script>
   <script>
 // JavaScript Logic
@@ -454,9 +454,7 @@ function handleFileUpload(e) {
       const result = await mammoth.extractRawText({ arrayBuffer: ev.target.result });
       text = result.value;
     } else return showNotification("Unsupported file", "error");
-
-    words = text.split(/[
-,]+/).map(w => w.trim()).filter(Boolean);
+    words = text.split(/[\\n,]+/).map(w => w.trim()).filter(Boolean);
     resetSession();
     showNotification(`${words.length} words loaded!`, "success");
     presentWord();
