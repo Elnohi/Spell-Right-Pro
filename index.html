@@ -135,8 +135,7 @@
       <select id="examSelect">
         <option value="">-- Choose --</option>
         <option value="OET">OET</option>
-        <option value="IELTS">IELTS</option>
-        <option value="USMLE">USMLE</option>
+        
       </select>
       <label>Accent:</label>
       <select id="accentSelect">
@@ -235,25 +234,25 @@ document.getElementById("examSelect").addEventListener("change", () => {
   if (exam === "OET") {
     words = [...oetWordList];
     showNotification("OET word list loaded!", "success");
-  } else if (exam === "IELTS") {
-    words = ["diagnosis", "prescription", "symptom", "treatment", "allergy"];
-    showNotification("IELTS medical words loaded!", "success");
-  } else if (exam === "USMLE") {
-    words = ["anatomy", "physiology", "pathology", "pharmacology", "biochemistry"];
-    showNotification("USMLE vocabulary loaded!", "success");
-  } else {
+  }  else {
     words = [];
     document.getElementById("trainer").innerHTML = '<div class="card"><p>No words loaded. Please select an exam or add custom words.</p></div>';
     return;
   }
   resetSession();
-  showNotification("Exam word list loaded!", "success");
+  // Notification only for actual exam
+  if (exam) showNotification("Exam word list loaded!", "success");
 });
 
 function startPractice() {
   if (!words.length) return showNotification("Please load words first", "error");
   mode = "practice";
-  loadProgress();
+  currentWordIndex = 0;
+  correctCount = 0;
+  flaggedWords = [];
+  incorrectWords = [];
+  previousWords = [];
+
   presentWord();
 }
 
