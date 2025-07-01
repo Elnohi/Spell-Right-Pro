@@ -427,8 +427,7 @@ function loadProgress() {
 function addCustomWords() {
   const input = document.getElementById("wordInput").value.trim();
   if (!input) return showNotification("Enter some words", "error");
-  words = input.split(/[
-,]+/).map(w => w.trim()).filter(Boolean);
+  words = input.split(/[\\n,]+/).map(w => w.trim()).filter(Boolean);
   document.getElementById("wordInput").value = "";
   resetSession();
   showNotification("Custom words added!", "success");
@@ -449,8 +448,7 @@ function handleFileUpload(e) {
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const content = await page.getTextContent();
-        text += content.items.map(item => item.str).join(" ") + "
-";
+        text += content.items.map(item => item.str).join(" ") + "\\n";
       }
     } else if (ext === "docx") {
       const result = await mammoth.extractRawText({ arrayBuffer: ev.target.result });
