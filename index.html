@@ -168,11 +168,20 @@
       <button onclick="clearWordList()" class="btn btn-warning">Clear Words</button>
     </div>
 
-    <form name="comments" method="POST" data-netlify="true" class="form-row">
-      <input type="hidden" name="form-name" value="comments" />
-      <textarea name="message" rows="3" placeholder="Write your notes or comments here..." style="width:100%;"></textarea>
-      <button type="submit" class="btn btn-success">Send Comment</button>
-    </form>
+  <form name="comments" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="form-row">
+  <input type="hidden" name="form-name" value="comments" />
+  <p hidden>
+    <label>Don’t fill this out: <input name="bot-field" /></label>
+  </p>
+
+  <label for="commentEmail">Your Email:</label>
+  <input type="email" name="email" id="commentEmail" placeholder="Enter your email" required />
+
+  <textarea name="message" rows="3" name="message" placeholder="Write your notes or comments here..." style="width:100%;" required></textarea>
+
+  <button type="submit" class="btn btn-success">Send Comment</button>
+</form>
+
 
     <div id="trainer" class="card"></div>
     <div id="scoreDisplay" class="card"></div>
