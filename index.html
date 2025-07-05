@@ -3,6 +3,56 @@
 <head>
   <meta charset="UTF-8" />
   <!-- Google tag (gtag.js) -->
+  <!-- Firebase App (Core) -->
+<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
+
+<script>
+  // TODO: Replace with your Firebase config
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+</script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0YSR05E7NR"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-0YSR05E7NR');
+</script>
+<script>
+  function trackBuiltInList(listName) {
+    if (typeof gtag === 'function') {
+      gtag('event', 'use_built_in_list', {
+        'event_category': 'Word Source',
+        'event_label': listName,
+      });
+    }
+  }
+
+  function trackCustomList(sourceType) {
+    if (typeof gtag === 'function') {
+      gtag('event', 'use_custom_list', {
+        'event_category': 'Word Source',
+        'event_label': sourceType,
+      });
+    }
+  }
+</script>
+
+  <meta charset="UTF-8" />
+  <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-0YSR05E7NR"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -216,18 +266,36 @@
     const storageKey = "spellrightpro-progress";
 
     function loginUser() {
-      userEmail = document.getElementById("userEmail").value.trim();
-      const status = document.getElementById("loginStatus");
-      if (userEmail) {
-        status.textContent = `Logged in as ${userEmail}`;
-        status.className = "status correct";
-        showNotification("Login successful!", "success");
+  const email = document.getElementById("userEmail").value.trim();
+  const password = prompt("Enter password:");
+
+  if (!email || !password) {
+    return showNotification("Email and password required", "error");
+  }
+
+  auth.signInWithEmailAndPassword(email, password)
+    .then(() => {
+      userEmail = email;
+      document.getElementById("loginStatus").textContent = `Logged in as ${email}`;
+      showNotification("Login successful!", "success");
+      loadWordList(); // auto-load saved list
+    })
+    .catch(error => {
+      if (error.code === "auth/user-not-found") {
+        if (confirm("No account found. Create new account?")) {
+          auth.createUserWithEmailAndPassword(email, password)
+            .then(() => {
+              userEmail = email;
+              document.getElementById("loginStatus").textContent = `Account created for ${email}`;
+              showNotification("Account created!", "success");
+            })
+            .catch(err => showNotification(err.message, "error"));
+        }
       } else {
-        status.textContent = "Please enter a valid email";
-        status.className = "status incorrect";
-        showNotification("Please enter a valid email", "error");
+        showNotification(error.message, "error");
       }
-    }
+    });
+}
 
     function changeAccent() {
       currentAccent = document.getElementById("accentSelect").value;
@@ -478,23 +546,27 @@
     }
 
     function saveWordList() {
-      if (!userEmail) return showNotification("Login first", "error");
-      localStorage.setItem(`spellright-list-${userEmail}`, JSON.stringify(words));
-      showNotification("Word list saved!", "success");
-    }
+  if (!userEmail) return showNotification("Login first", "error");
+  db.collection("wordLists").doc(userEmail).set({ words })
+    .then(() => showNotification("Words saved to cloud!", "success"))
+    .catch(err => showNotification("Failed to save words: " + err.message, "error"));
+}
 
     function loadWordList() {
-      if (!userEmail) return showNotification("Login first", "error");
-      const saved = localStorage.getItem(`spellright-list-${userEmail}`);
-      if (saved) {
-        words = JSON.parse(saved);
+  if (!userEmail) return showNotification("Login first", "error");
+  db.collection("wordLists").doc(userEmail).get()
+    .then(doc => {
+      if (doc.exists) {
+        words = doc.data().words || [];
         resetSession();
-        showNotification("Word list loaded!", "success");
+        showNotification("Words loaded from cloud!", "success");
         presentWord();
       } else {
-        showNotification("No saved list found", "error");
+        showNotification("No saved list found in cloud", "info");
       }
-    }
+    })
+    .catch(err => showNotification("Error loading words: " + err.message, "error"));
+}
 
     function attachLoginEmail() {
   const userEmail = document.getElementById("userEmail").value.trim();
