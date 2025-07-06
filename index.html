@@ -31,6 +31,24 @@
   <script src="word-manager.js" type="module"></script>
   <script src="trainer.js" type="module"></script>
   <script src="app.js" type="module"></script>
+  
+  <!-- Word Lists -->
+  <script src="oet_word_list.js"></script>
+  <script>
+    // Sample IELTS word list (replace with your actual list)
+    const ieltsWordList = [
+      "academic", "analysis", "approach", "assessment", "assumption",
+      "authority", "available", "benefit", "concept", "consistent",
+      "context", "coordination", "corresponding", "criteria", "deduction",
+      "demonstrate", "document", "dominant", "emphasis", "ensure",
+      "exclude", "framework", "illustrate", "impact", "indicate",
+      "individual", "interpretation", "justify", "negative", "outcome",
+      "period", "positive", "potential", "previous", "primary",
+      "principle", "procedure", "process", "required", "research",
+      "response", "restrict", "section", "select", "strategy",
+      "theory", "variable", "achieve", "acquisition", "administration"
+    ];
+  </script>
 </head>
 <body>
   <div class="container">
@@ -53,11 +71,13 @@
       <select id="examSelect">
         <option value="">-- Choose --</option>
         <option value="OET">OET</option>
+        <option value="IELTS">IELTS</option>
       </select>
       <label for="accentSelect">Accent:</label>
       <select id="accentSelect">
         <option value="en-GB">British</option>
         <option value="en-US">American</option>
+        <option value="en-AU">Australian</option>
       </select>
       <button id="modeToggle" class="btn" aria-label="Toggle dark mode">
         <i id="modeIcon" class="fas fa-moon"></i>
