@@ -49,18 +49,6 @@
       });
     }
   }
-
-  auth.onAuthStateChanged(user => {
-  if (user) {
-    userEmail = user.email;
-    document.getElementById("loginStatus").textContent = `✅ Logged in as ${userEmail}`;
-    loadWordList();
-  } else {
-    userEmail = "";
-    document.getElementById("loginStatus").textContent = "🔒 Not logged in";
-  }
-});
-
 </script>
 
   <meta charset="UTF-8" />
@@ -198,16 +186,12 @@
     <img src="logo.png" alt="SpellRightPro Logo" style="height:50px; vertical-align:middle; margin-right:10px;" />
     <h1 style="display:inline-block; vertical-align:middle;">SpellRightPro</h1>
 
-    <div class="form-row" id="authSection">
-  <label>Email:</label>
-  <input type="email" id="userEmail" placeholder="Enter email" />
-  <label>Password:</label>
-  <input type="password" id="userPassword" placeholder="Enter password" />
-  <button onclick="loginUser()" class="btn">Login</button>
-  <button onclick="signUpUser()" class="btn btn-info">Sign Up</button>
-  <button onclick="logoutUser()" class="btn btn-warning">Logout</button>
-  <span id="loginStatus"></span>
-</div>
+    <div class="form-row">
+      <label>Email:</label>
+      <input type="email" id="userEmail" />
+      <button onclick="loginUser()" class="btn">Login</button>
+      <span id="loginStatus"></span>
+    </div>
 
     <div class="form-row">
       <label>Select Exam:</label>
@@ -249,7 +233,7 @@
   <input type="hidden" name="email" id="formHiddenEmail" />
 
   <p hidden>
-    <label>Don’t fill this out: <input name="bot-field" /></label>
+    <label>DonÂ’t fill this out: <input name="bot-field" /></label>
   </p>
 
   <textarea name="message" rows="3" placeholder="Write your notes or comments here..." style="width:100%;" required></textarea>
@@ -283,75 +267,13 @@
 
     function loginUser() {
   const email = document.getElementById("userEmail").value.trim();
-  const password = document.getElementById("userPassword").value;
+  const password = prompt("Enter password:");
 
   if (!email || !password) {
     return showNotification("Email and password required", "error");
   }
 
-  auth.signInWithEmailAndPassword(email, password)
-    .then(() => {
-      userEmail = email;
-      document.getElementById("loginStatus").textContent = `✅ Logged in as ${email}`;
-      showNotification("Login successful!", "success");
-      loadWordList(); // auto-load saved list
-    })
-    .catch(error => showNotification(error.message, "error"));
-}
-
-      function signUpUser() {
-  const email = document.getElementById("userEmail").value.trim();
-  const password = document.getElementById("userPassword").value;
-
-  if (!email || !password) {
-    return showNotification("Email and password required", "error");
-  }
-
-  auth.createUserWithEmailAndPassword(email, password)
-    .then(() => {
-      userEmail = email;
-      document.getElementById("loginStatus").textContent = `✅ Account created: ${email}`;
-      showNotification("Account created and signed in!", "success");
-      loadWordList();
-    })
-    .catch(error => showNotification(error.message, "error"));
-}
-
-function logoutUser() {
-  auth.signOut()
-    .then(() => {
-      userEmail = "";
-      document.getElementById("loginStatus").textContent = "🔒 Logged out";
-      showNotification("You have logged out", "info");
-      document.getElementById("trainer").innerHTML = "";
-      document.getElementById("scoreDisplay").innerHTML = "";
-    })
-    .catch(err => showNotification(err.message, "error"));
-}
-
-  auth.signInWithEmailAndPassword(email, password)
-    .then(() => {
-      userEmail = email;
-      document.getElementById("loginStatus").textContent = `Logged in as ${email}`;
-      showNotification("Login successful!", "success");
-      loadWordList(); // auto-load saved list
-    })
-    .catch(error => {
-      if (error.code === "auth/user-not-found") {
-        if (confirm("No account found. Create new account?")) {
-          auth.createUserWithEmailAndPassword(email, password)
-            .then(() => {
-              userEmail = email;
-              document.getElementById("loginStatus").textContent = `Account created for ${email}`;
-              showNotification("Account created!", "success");
-            })
-            .catch(err => showNotification(err.message, "error"));
-        }
-      } else {
-        showNotification(error.message, "error");
-      }
-    });
-}
+  
 
     function changeAccent() {
       currentAccent = document.getElementById("accentSelect").value;
@@ -517,7 +439,7 @@ function logoutUser() {
       const percent = Math.round((correctCount / words.length) * 100);
       div.innerHTML = `<div class="card"><h2>Test Complete</h2><p>You scored ${correctCount} out of ${words.length} (${percent}%)</p>` +
       (incorrectWords.length ? `<h3>Incorrect Words</h3><ul>` +
-        incorrectWords.map(w => `<li><strong>${w.word}</strong> — You typed: <em>${w.typed}</em></li>`).join('') +
+        incorrectWords.map(w => `<li><strong>${w.word}</strong> Â— You typed: <em>${w.typed}</em></li>`).join('') +
         `</ul>` : '') +
       (flaggedWords.length ? `<h3>Flagged Words</h3><ul>` +
         flaggedWords.map(i => `<li>${words[i]}</li>`).join('') + `</ul>` : '') +
