@@ -186,12 +186,16 @@
     <img src="logo.png" alt="SpellRightPro Logo" style="height:50px; vertical-align:middle; margin-right:10px;" />
     <h1 style="display:inline-block; vertical-align:middle;">SpellRightPro</h1>
 
-    <div class="form-row">
-      <label>Email:</label>
-      <input type="email" id="userEmail" />
-      <button onclick="loginUser()" class="btn">Login</button>
-      <span id="loginStatus"></span>
-    </div>
+    <div class="form-row" id="authSection">
+  <label>Email:</label>
+  <input type="email" id="userEmail" placeholder="Enter email" />
+  <label>Password:</label>
+  <input type="password" id="userPassword" placeholder="Enter password" />
+  <button onclick="loginUser()" class="btn">Login</button>
+  <button onclick="signUpUser()" class="btn btn-info">Sign Up</button>
+  <button onclick="logoutUser()" class="btn btn-warning">Logout</button>
+  <span id="loginStatus"></span>
+</div>
 
     <div class="form-row">
       <label>Select Exam:</label>
@@ -267,11 +271,51 @@
 
     function loginUser() {
   const email = document.getElementById("userEmail").value.trim();
-  const password = prompt("Enter password:");
+  const password = document.getElementById("userPassword").value;
 
   if (!email || !password) {
     return showNotification("Email and password required", "error");
   }
+
+  auth.signInWithEmailAndPassword(email, password)
+    .then(() => {
+      userEmail = email;
+      document.getElementById("loginStatus").textContent = `✅ Logged in as ${email}`;
+      showNotification("Login successful!", "success");
+      loadWordList(); // auto-load saved list
+    })
+    .catch(error => showNotification(error.message, "error"));
+}
+
+      function signUpUser() {
+  const email = document.getElementById("userEmail").value.trim();
+  const password = document.getElementById("userPassword").value;
+
+  if (!email || !password) {
+    return showNotification("Email and password required", "error");
+  }
+
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(() => {
+      userEmail = email;
+      document.getElementById("loginStatus").textContent = `✅ Account created: ${email}`;
+      showNotification("Account created and signed in!", "success");
+      loadWordList();
+    })
+    .catch(error => showNotification(error.message, "error"));
+}
+
+function logoutUser() {
+  auth.signOut()
+    .then(() => {
+      userEmail = "";
+      document.getElementById("loginStatus").textContent = "🔒 Logged out";
+      showNotification("You have logged out", "info");
+      document.getElementById("trainer").innerHTML = "";
+      document.getElementById("scoreDisplay").innerHTML = "";
+    })
+    .catch(err => showNotification(err.message, "error"));
+}
 
   auth.signInWithEmailAndPassword(email, password)
     .then(() => {
