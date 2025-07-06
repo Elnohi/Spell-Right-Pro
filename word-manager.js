@@ -127,6 +127,16 @@ export function setWords(newWords) {
   resetSession();
 }
 
+// Track built-in list usage
+function trackBuiltInList(listName) {
+  if (typeof gtag === 'function') {
+    gtag('event', 'use_built_in_list', {
+      'event_category': 'Word Source',
+      'event_label': listName,
+    });
+  }
+}
+
 // Initialize word manager listeners
 export function initWordManagerListeners() {
   document.getElementById("saveWordsBtn").addEventListener("click", saveWordList);
@@ -136,11 +146,20 @@ export function initWordManagerListeners() {
   document.getElementById("fileInput").addEventListener("change", handleFileUpload);
   
   document.getElementById("examSelect").addEventListener("change", (e) => {
-    if (e.target.value === "OET") {
-      setWords(window.oetWordList || []);
-      showNotification("OET word list loaded!", "success");
-    } else {
-      setWords([]);
+    switch(e.target.value) {
+      case "OET":
+        setWords(window.oetWordList || []);
+        trackBuiltInList("OET");
+        showNotification("OET word list loaded!", "success");
+        break;
+      case "IELTS":
+        setWords(window.ieltsWordList || []);
+        trackBuiltInList("IELTS");
+        showNotification("IELTS word list loaded!", "success");
+        break;
+      default:
+        setWords([]);
+        showNotification("Word list cleared", "info");
     }
   });
 }
