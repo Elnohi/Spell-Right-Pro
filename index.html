@@ -49,6 +49,18 @@
       });
     }
   }
+
+  auth.onAuthStateChanged(user => {
+  if (user) {
+    userEmail = user.email;
+    document.getElementById("loginStatus").textContent = `✅ Logged in as ${userEmail}`;
+    loadWordList();
+  } else {
+    userEmail = "";
+    document.getElementById("loginStatus").textContent = "🔒 Not logged in";
+  }
+});
+
 </script>
 
   <meta charset="UTF-8" />
