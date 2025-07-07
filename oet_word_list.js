@@ -1,5 +1,4 @@
-// oet_word_list.js
-const oetWordList = [
+const OET_WORD_LIST = [
   "Strawberry tongue", "Irritable", "Washing hair", "Sepsis", "Pneumonia",
   "Diabetes", "Knife and fork", "Scarlet fever", "Bloodshot", "Fingertips",
   "Cracked lips", "Japan", "Epilepsy", "Concentrate", "Booster injection",
