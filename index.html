@@ -431,36 +431,37 @@
     }
 
     function startPractice() {
-      if (!currentWords.length) return showNotification("Please load words first", "error");
-      mode = "practice";
-      
-      // Load progress if available for current word list
-      const progress = JSON.parse(localStorage.getItem(storageKey));
-      if (progress && progress.words.join() === currentWords.join() && progress.listType === currentListType) {
-        if (confirm("Found previous progress. Do you want to resume where you left off?")) {
-          currentWordIndex = progress.currentWordIndex;
-          correctCount = progress.correctCount;
-          flaggedWords = progress.flaggedWords;
-          incorrectWords = progress.incorrectWords;
-          previousWords = progress.previousWords;
-          presentWord();
-          return;
-        }
-      }
-      resetSession();
+  if (currentListType === "oet") {
+    currentWords = [...oetWords]; // Use full OET list
+  }
+  if (!currentWords.length) return showNotification("Please load words first", "error");
+  mode = "practice";
+  
+  const progress = JSON.parse(localStorage.getItem(storageKey));
+  if (progress && progress.words.join() === currentWords.join() && progress.listType === currentListType) {
+    if (confirm("Found previous progress. Do you want to resume where you left off?")) {
+      currentWordIndex = progress.currentWordIndex;
+      correctCount = progress.correctCount;
+      flaggedWords = progress.flaggedWords;
+      incorrectWords = progress.incorrectWords;
+      previousWords = progress.previousWords;
       presentWord();
+      return;
     }
+  }
+  resetSession();
+  presentWord();
+}
 
-    function startTest() {
-      if (!currentWords.length) return showNotification("Please load words first", "error");
-      mode = "test";
-      
-      // For test mode, we always use a shuffled subset
-      const testWords = shuffle([...currentWords]).slice(0, 24);
-      currentWords = testWords;
-      resetSession();
-      presentWord();
-    }
+function startTest() {
+  if (currentListType === "oet") {
+    currentWords = shuffle([...oetWords]).slice(0, 24); // Use 24 random OET words
+  }
+  if (!currentWords.length) return showNotification("Please load words first", "error");
+  mode = "test";
+  resetSession();
+  presentWord();
+}
 
     function speak(text) {
       synth.cancel();
