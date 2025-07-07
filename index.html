@@ -246,29 +246,17 @@
     </div>
 
     <!-- Netlify Form -->
-    <form name="feedback" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="form-row" id="feedbackForm">
-  <input type="hidden" name="form-name" value="feedback" />
-  <input type="hidden" name="user-email" id="formHiddenEmail" />
-  <p hidden>
-    <label>Don�t fill this out: <input name="bot-field" /></label>
-  </p>
-
-  <textarea 
-    name="message" 
-    id="feedbackMessage" 
-    rows="3" 
-    placeholder="Write your notes or comments here..." 
-    style="width:100%;" 
-    required 
-    oninput="updateCharCount()"
-  ></textarea>
-  <div style="width:100%; display:flex; justify-content:space-between; align-items:center; font-size:0.9em;">
-    <span id="charCounter">0 characters</span>
-    <button type="submit" class="btn btn-success" id="submitBtn" disabled>
-      <i class="fas fa-paper-plane"></i> Send Comment
-    </button>
-  </div>
-</form>
+    <form name="feedback" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="form-row">
+      <input type="hidden" name="form-name" value="feedback" />
+      <input type="hidden" name="user-email" id="formHiddenEmail" />
+      <p hidden>
+        <label>Don't fill this out: <input name="bot-field" /></label>
+      </p>
+      <textarea name="message" rows="3" placeholder="Write your notes or comments here..." style="width:100%;" required></textarea>
+      <button type="submit" class="btn btn-success" id="submitBtn">
+        <i class="fas fa-paper-plane"></i> Send Comment
+      </button>
+    </form>
 
     <!-- Hidden Netlify Form for Fallback Submission -->
     <form name="feedback" netlify netlify-honeypot="bot-field" hidden>
@@ -300,12 +288,12 @@
     auth.onAuthStateChanged(user => {
       if (user) {
         userEmail = user.email;
-        document.getElementById("loginStatus").textContent = `✓ Logged in as ${userEmail}`;
+        document.getElementById("loginStatus").textContent = `? Logged in as ${userEmail}`;
         document.getElementById("loginStatus").style.color = "green";
         loadWordList();
       } else {
         userEmail = "";
-        document.getElementById("loginStatus").textContent = "✗ Not logged in";
+        document.getElementById("loginStatus").textContent = "? Not logged in";
         document.getElementById("loginStatus").style.color = "red";
       }
     });
@@ -340,6 +328,52 @@
         document.getElementById("scoreDisplay").innerHTML = "";
       });
     }
+
+    // Form submission handler - Updated to match working version
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.querySelector('form[data-netlify="true"]');
+      
+      if (form) {
+        form.addEventListener('submit', function(event) {
+          if (!attachLoginEmail()) {
+            event.preventDefault();
+            showNotification("Please login before submitting comments", "error");
+            return false;
+          }
+
+          const submitBtn = document.getElementById('submitBtn');
+          const originalBtnText = submitBtn.innerHTML;
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+          setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+          }, 2000);
+        });
+      }
+
+      // Initialize dark mode if enabled
+      if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add("dark-mode");
+        document.getElementById("modeIcon").className = "fas fa-sun";
+      }
+
+      // Set up mode toggle
+      document.getElementById("modeToggle").addEventListener("click", () => {
+        const body = document.body;
+        const icon = document.getElementById("modeIcon");
+        body.classList.toggle("dark-mode");
+        const dark = body.classList.contains("dark-mode");
+        icon.className = dark ? "fas fa-sun" : "fas fa-moon";
+        localStorage.setItem('darkMode', dark ? 'enabled' : 'disabled');
+      });
+
+      // Initialize speech synthesis
+      if (synth.onvoiceschanged !== undefined) {
+        synth.onvoiceschanged = () => {};
+      }
+    });
 
     function attachLoginEmail() {
       const user = auth.currentUser;
@@ -478,11 +512,11 @@
         previousWords.push(currentWordIndex);
         
         if (typed === correct) {
-          status.textContent = "✓ Correct!";
+          status.textContent = "? Correct!";
           status.className = "status correct";
           correctCount++;
         } else {
-          status.textContent = `✗ Incorrect. The correct spelling is: ${word}`;
+          status.textContent = `? Incorrect. The correct spelling is: ${word}`;
           status.className = "status incorrect";
           incorrectWords.push({ word, typed });
         }
@@ -520,7 +554,7 @@
           ${incorrectWords.length ? `
             <h3>Incorrect Words</h3>
             <ul style="text-align: left;">
-              ${incorrectWords.map(w => `<li><strong>${w.word}</strong> – You typed: <em>${w.typed}</em></li>`).join('')}
+              ${incorrectWords.map(w => `<li><strong>${w.word}</strong> � You typed: <em>${w.typed}</em></li>`).join('')}
             </ul>
           ` : ''}
           ${flaggedWords.length ? `
@@ -686,142 +720,6 @@
       }
       return arr;
     }
-
-    // Initialize the application with working form submission
-    document.addEventListener('DOMContentLoaded', function() {
-      const form = document.querySelector('form[data-netlify="true"]');
-      
-      if (form) {
-        form.addEventListener('submit', function(event) {
-          event.preventDefault();
-          
-          if (!attachLoginEmail()) {
-            showNotification("Please login before submitting comments", "error");
-            return false;
-          }
-
-          const submitBtn = document.getElementById('submitBtn');
-          const originalBtnText = submitBtn.innerHTML;
-          submitBtn.disabled = true;
-          submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-
-          // Create a FormData object from the form
-          const formData = new FormData(form);
-          
-          // Method 1: Standard Netlify form submission
-          fetch('/', {
-            method: 'POST',
-            headers: { 
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams(formData).toString()
-          })
-          .then(response => {
-            if (response.ok) {
-              showNotification("Comment submitted successfully!", "success");
-              form.reset();
-            } else {
-              throw new Error('Form submission failed');
-            }
-          })
-          .catch(error => {
-            console.error('Form submission error:', error);
-            // Fallback to traditional form submission
-            form.setAttribute("target", "_blank");
-            form.submit();
-            showNotification("Form submitted (fallback method)", "success");
-          })
-          .finally(() => {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalBtnText;
-          });
-        });
-      }
-
-      // Initialize dark mode if enabled
-      if (localStorage.getItem('darkMode') === 'enabled') {
-        document.body.classList.add("dark-mode");
-        document.getElementById("modeIcon").className = "fas fa-sun";
-      }
-
-      // Set up mode toggle
-      document.getElementById("modeToggle").addEventListener("click", () => {
-        const body = document.body;
-        const icon = document.getElementById("modeIcon");
-        body.classList.toggle("dark-mode");
-        const dark = body.classList.contains("dark-mode");
-        icon.className = dark ? "fas fa-sun" : "fas fa-moon";
-        localStorage.setItem('darkMode', dark ? 'enabled' : 'disabled');
-      });
-
-      // Initialize speech synthesis
-      if (synth.onvoiceschanged !== undefined) {
-        synth.onvoiceschanged = () => {};
-      }
-    });
-<script>
-  function updateCharCount() {
-    const msg = document.getElementById("feedbackMessage").value;
-    document.getElementById("charCounter").textContent = `${msg.length} characters`;
-    document.getElementById("submitBtn").disabled = msg.trim().length === 0;
-  }
-
-  // Slight improvement to show a success animation after form submission
-  function showSuccessAnimation() {
-    const form = document.getElementById("feedbackForm");
-    form.reset();
-    updateCharCount();
-    document.getElementById("submitBtn").disabled = true;
-  }
-
-  // Update form listener inside DOMContentLoaded
-  document.addEventListener('DOMContentLoaded', function() {
-    const form = document.querySelector('form[data-netlify="true"]');
-    if (form) {
-      form.addEventListener('submit', function(event) {
-        event.preventDefault();
-        if (!attachLoginEmail()) {
-          showNotification("Please login before submitting comments", "error");
-          return false;
-        }
-
-        const submitBtn = document.getElementById('submitBtn');
-        const originalBtnText = submitBtn.innerHTML;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-
-        const formData = new FormData(form);
-
-        fetch('/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams(formData).toString()
-        })
-        .then(response => {
-          if (response.ok) {
-            showNotification("Comment submitted successfully!", "success");
-            showSuccessAnimation();
-          } else {
-            throw new Error('Form submission failed');
-          }
-        })
-        .catch(error => {
-          console.error('Form submission error:', error);
-          form.setAttribute("target", "_blank");
-          form.submit();
-          showNotification("Form submitted (fallback method)", "success");
-        })
-        .finally(() => {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = originalBtnText;
-        });
-      });
-
-      updateCharCount(); // Init character counter
-    }
-  });
-</script>
-  </body>
+  </script>
+</body>
 </html>
