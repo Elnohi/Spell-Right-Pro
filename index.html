@@ -288,12 +288,11 @@
     auth.onAuthStateChanged(user => {
       if (user) {
         userEmail = user.email;
-        document.getElementById("loginStatus").textContent = `? Logged in as ${userEmail}`;
+        document.getElementById("loginStatus").textContent = `Logged in as ${userEmail}`;
         document.getElementById("loginStatus").style.color = "green";
-        loadWordList();
       } else {
         userEmail = "";
-        document.getElementById("loginStatus").textContent = "? Not logged in";
+        document.getElementById("loginStatus").textContent = "Not logged in";
         document.getElementById("loginStatus").style.color = "red";
       }
     });
@@ -410,6 +409,19 @@
     function startPractice() {
       if (!words.length) return showNotification("Please load words first", "error");
       mode = "practice";
+      // Load progress if available
+      const progress = JSON.parse(localStorage.getItem(storageKey));
+      if (progress && progress.words.join() === words.join()) {
+        if (confirm("Found previous progress. Do you want to resume where you left off?")) {
+          currentWordIndex = progress.currentWordIndex;
+          correctCount = progress.correctCount;
+          flaggedWords = progress.flaggedWords;
+          incorrectWords = progress.incorrectWords;
+          previousWords = progress.previousWords;
+          presentWord();
+          return;
+        }
+      }
       resetSession();
       presentWord();
     }
@@ -512,11 +524,11 @@
         previousWords.push(currentWordIndex);
         
         if (typed === correct) {
-          status.textContent = "? Correct!";
+          status.textContent = "✓ Correct!";
           status.className = "status correct";
           correctCount++;
         } else {
-          status.textContent = `? Incorrect. The correct spelling is: ${word}`;
+          status.textContent = `✗ Incorrect. The correct spelling is: ${word}`;
           status.className = "status incorrect";
           incorrectWords.push({ word, typed });
         }
@@ -554,7 +566,7 @@
           ${incorrectWords.length ? `
             <h3>Incorrect Words</h3>
             <ul style="text-align: left;">
-              ${incorrectWords.map(w => `<li><strong>${w.word}</strong> � You typed: <em>${w.typed}</em></li>`).join('')}
+              ${incorrectWords.map(w => `<li><strong>${w.word}</strong>   You typed: <em>${w.typed}</em></li>`).join('')}
             </ul>
           ` : ''}
           ${flaggedWords.length ? `
@@ -688,11 +700,19 @@
         .then(doc => {
           if (doc.exists) {
             words = doc.data().words || [];
-            resetSession();
             showNotification(`Loaded ${words.length} words from cloud!`, "success");
-            
-            if (words.length > 0) {
-              presentWord();
+            // Check for existing progress
+            const progress = JSON.parse(localStorage.getItem(storageKey));
+            if (progress && progress.words.join() === words.join()) {
+              if (confirm("Found previous progress. Do you want to resume where you left off?")) {
+                currentWordIndex = progress.currentWordIndex;
+                correctCount = progress.correctCount;
+                flaggedWords = progress.flaggedWords;
+                incorrectWords = progress.incorrectWords;
+                previousWords = progress.previousWords;
+                mode = "practice";
+                presentWord();
+              }
             }
           } else {
             showNotification("No saved word list found in cloud", "info");
