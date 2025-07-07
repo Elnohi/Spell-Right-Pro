@@ -4,120 +4,185 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SpellRightPro</title>
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-H09MF13297"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-H09MF13297');
+  </script>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
+
+  <!-- Firebase Config -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCZ-rAPnRgVjSRFOFvbiQlowE6A3RVvwWo",
+      authDomain: "spellrightpro-firebase.firebaseapp.com",
+      projectId: "spellrightpro-firebase",
+      storageBucket: "spellrightpro-firebase.firebasestorage.app",
+      messagingSenderId: "798456641137",
+      appId: "1:798456641137:web:5c6d79db5bf49d04928dd0",
+      measurementId: "G-H09MF13297"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
+
+  <!-- FontAwesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f8f9fa;
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 0; 
+      padding: 0; 
+      background: #f8f9fa; 
+      transition: background 0.3s ease;
     }
-    .container {
-      max-width: 960px;
-      margin: auto;
-      padding: 20px;
+    .container { 
+      max-width: 960px; 
+      margin: auto; 
+      padding: 20px; 
     }
-    .form-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      margin-top: 15px;
+    .form-row { 
+      display: flex; 
+      flex-wrap: wrap; 
+      gap: 10px; 
+      align-items: center; 
+      margin-top: 15px; 
     }
-    .form-row label {
-      min-width: 100px;
+    .form-row label { 
+      min-width: 100px; 
     }
-    .form-row select,
-    .form-row input[type="email"],
-    .form-row textarea,
+    .form-row select, 
+    .form-row input[type="email"], 
+    .form-row input[type="password"],
+    .form-row textarea, 
     .form-row input[type="file"] {
-      flex: 1;
-      padding: 8px;
-      border: 1px solid #ccc;
+      flex: 1; 
+      padding: 8px; 
+      border: 1px solid #ccc; 
       border-radius: 5px;
+      transition: all 0.3s ease;
     }
-    .controls, .card, .status {
-      margin-top: 15px;
+    .btn { 
+      padding: 10px 15px; 
+      margin: 5px; 
+      border: none; 
+      background: #007bff; 
+      color: white; 
+      border-radius: 5px; 
+      cursor: pointer; 
+      transition: all 0.3s ease;
     }
-    .btn {
-      padding: 10px 15px;
-      margin: 5px;
-      border: none;
-      background: #007bff;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
+    .btn:hover { 
+      background: #0056b3; 
+      transform: translateY(-1px);
     }
-    .btn:hover {
-      background: #0056b3;
+    .btn:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+      transform: none;
     }
-    .btn-info {
-      background: #17a2b8;
+    .btn-info { 
+      background: #17a2b8; 
     }
-    .btn-success {
-      background: #28a745;
+    .btn-success { 
+      background: #28a745; 
     }
-    .btn-warning {
-      background: #ffc107;
-      color: black;
+    .btn-warning { 
+      background: #ffc107; 
+      color: black; 
     }
-    .word-box {
-      padding: 20px;
-      border: 2px solid #007bff;
-      border-radius: 10px;
-      background: white;
+    .word-box { 
+      padding: 20px; 
+      border: 2px solid #007bff; 
+      border-radius: 10px; 
+      background: white; 
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
     }
-    .progress-container {
-      height: 10px;
-      background: #ddd;
-      margin-bottom: 10px;
-      border-radius: 5px;
+    .progress-container { 
+      height: 10px; 
+      background: #ddd; 
+      margin-bottom: 10px; 
+      border-radius: 5px; 
     }
-    .progress-bar {
-      height: 10px;
-      background: #28a745;
-      width: 0%;
-      border-radius: 5px;
+    .progress-bar { 
+      height: 10px; 
+      background: #28a745; 
+      width: 0%; 
+      border-radius: 5px; 
+      transition: width 0.3s ease;
     }
-    .status.correct {
-      color: green;
+    .status.correct { 
+      color: green; 
+      font-weight: bold;
     }
-    .status.incorrect {
-      color: red;
+    .status.incorrect { 
+      color: red; 
+      font-weight: bold;
     }
     .notification {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
+      position: fixed; 
+      bottom: 20px; 
+      right: 20px; 
+      background: #333; 
+      color: #fff;
+      padding: 12px 18px; 
+      border-radius: 5px; 
+      opacity: 0; 
+      transition: opacity 0.3s ease-in-out; 
+      z-index: 1000;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .notification.show { 
+      opacity: 1; 
+    }
+    .notification.success {
+      background: #28a745;
+    }
+    .notification.error {
+      background: #dc3545;
+    }
+    .notification.info {
+      background: #17a2b8;
+    }
+    .dark-mode { 
+      background: #121212; 
+      color: #fff; 
+    }
+    .dark-mode .word-box { 
+      background: #1e1e1e; 
+      border-color: #444; 
+      color: #fff;
+    }
+    .dark-mode input,
+    .dark-mode select,
+    .dark-mode textarea {
       background: #333;
       color: #fff;
-      padding: 12px 18px;
-      border-radius: 5px;
-      opacity: 0;
-      transition: opacity 0.3s ease-in-out;
-    }
-    .notification.show {
-      opacity: 1;
-    }
-    .review-section {
-      margin-top: 10px;
-    }
-    .review-item {
-      margin-bottom: 5px;
-    }
-    .dark-mode {
-      background: #121212;
-      color: #fff;
-    }
-    .dark-mode .word-box {
-      background: #1e1e1e;
-      border-color: #444;
+      border-color: #555;
     }
     @media (max-width: 600px) {
-      .form-row {
-        flex-direction: column;
-        align-items: stretch;
+      .form-row { 
+        flex-direction: column; 
+        align-items: stretch; 
       }
+    }
+    .fa-spin {
+      animation: fa-spin 2s infinite linear;
+    }
+    @keyframes fa-spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -126,10 +191,14 @@
     <img src="logo.png" alt="SpellRightPro Logo" style="height:50px; vertical-align:middle; margin-right:10px;" />
     <h1 style="display:inline-block; vertical-align:middle;">SpellRightPro</h1>
 
-    <div class="form-row">
+    <div class="form-row" id="authSection">
       <label>Email:</label>
-      <input type="email" id="userEmail" />
+      <input type="email" id="userEmail" placeholder="Enter email" />
+      <label>Password:</label>
+      <input type="password" id="userPassword" placeholder="Enter password" />
       <button onclick="loginUser()" class="btn">Login</button>
+      <button onclick="signUpUser()" class="btn btn-info">Sign Up</button>
+      <button onclick="logoutUser()" class="btn btn-warning">Logout</button>
       <span id="loginStatus"></span>
     </div>
 
@@ -159,7 +228,7 @@
 
     <div class="form-row">
       <textarea id="wordInput" rows="3" placeholder="Enter custom words here..."></textarea>
-      <button onclick="addCustomWords()" class="btn">Add Custom Words</button>
+      <button type="button" onclick="addCustomWords()" class="btn">Add Custom Words</button>
     </div>
 
     <div class="form-row">
@@ -168,12 +237,6 @@
       <button onclick="clearWordList()" class="btn btn-warning">Clear Words</button>
     </div>
 
-    <form name="comments" method="POST" data-netlify="true" class="form-row">
-      <input type="hidden" name="form-name" value="comments" />
-      <textarea name="message" rows="3" placeholder="Write your notes or comments here..." style="width:100%;"></textarea>
-      <button type="submit" class="btn btn-success">Send Comment</button>
-    </form>
-
     <div id="trainer" class="card"></div>
     <div id="scoreDisplay" class="card"></div>
     <div id="loadingIndicator" style="display:none;">
@@ -181,11 +244,33 @@
         <div class="progress-bar"></div>
       </div>
     </div>
+
+    <!-- Netlify Form -->
+    <form name="feedback" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="form-row">
+      <input type="hidden" name="form-name" value="feedback" />
+      <input type="hidden" name="user-email" id="formHiddenEmail" />
+      <p hidden>
+        <label>Don't fill this out: <input name="bot-field" /></label>
+      </p>
+      <textarea name="message" rows="3" placeholder="Write your notes or comments here..." style="width:100%;" required></textarea>
+      <button type="submit" class="btn btn-success" id="submitBtn">
+        <i class="fas fa-paper-plane"></i> Send Comment
+      </button>
+    </form>
+
+    <!-- Hidden Netlify Form for Fallback Submission -->
+    <form name="feedback" netlify netlify-honeypot="bot-field" hidden>
+      <input type="text" name="user-email" />
+      <textarea name="message"></textarea>
+    </form>
   </div>
 
+  <!-- External Scripts -->
   <script src="oet_word_list.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.0/mammoth.browser.min.js"></script>
+
+  <!-- App Logic -->
   <script>
     let words = [];
     let userEmail = "";
@@ -197,54 +282,130 @@
     let previousWords = [];
     let mode = "";
     const storageKey = "spellrightpro-progress";
+    const synth = window.speechSynthesis;
+
+    // Initialize auth state listener
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        userEmail = user.email;
+        document.getElementById("loginStatus").textContent = `? Logged in as ${userEmail}`;
+        document.getElementById("loginStatus").style.color = "green";
+        loadWordList();
+      } else {
+        userEmail = "";
+        document.getElementById("loginStatus").textContent = "? Not logged in";
+        document.getElementById("loginStatus").style.color = "red";
+      }
+    });
 
     function loginUser() {
-      userEmail = document.getElementById("userEmail").value.trim();
-      const status = document.getElementById("loginStatus");
-      if (userEmail) {
-        status.textContent = `Logged in as ${userEmail}`;
-        status.className = "status correct";
-        showNotification("Login successful!", "success");
-      } else {
-        status.textContent = "Please enter a valid email";
-        status.className = "status incorrect";
-        showNotification("Please enter a valid email", "error");
+      const email = document.getElementById("userEmail").value.trim();
+      const password = document.getElementById("userPassword").value;
+      if (!email || !password) return showNotification("Email and password required", "error");
+
+      showNotification("Logging in...", "info");
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => showNotification("Login successful!", "success"))
+        .catch(error => showNotification(error.message, "error"));
+    }
+
+    function signUpUser() {
+      const email = document.getElementById("userEmail").value.trim();
+      const password = document.getElementById("userPassword").value;
+      if (!email || !password) return showNotification("Email and password required", "error");
+
+      showNotification("Creating account...", "info");
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(() => showNotification("Account created and signed in!", "success"))
+        .catch(error => showNotification(error.message, "error"));
+    }
+
+    function logoutUser() {
+      showNotification("Logging out...", "info");
+      auth.signOut().then(() => {
+        showNotification("You have logged out", "info");
+        document.getElementById("trainer").innerHTML = "";
+        document.getElementById("scoreDisplay").innerHTML = "";
+      });
+    }
+
+    // Form submission handler - Direct copy from index.html
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.querySelector('form[data-netlify="true"]');
+      
+      if (form) {
+        form.addEventListener('submit', function(event) {
+          if (!attachLoginEmail()) {
+            event.preventDefault();
+            showNotification("Please login before submitting comments", "error");
+            return false;
+          }
+
+          const submitBtn = document.getElementById('submitBtn');
+          const originalBtnText = submitBtn.innerHTML;
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+          setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+          }, 2000);
+        });
       }
-    }
 
-    function changeAccent() {
-      currentAccent = document.getElementById("accentSelect").value;
-      const text = document.getElementById("accentSelect").selectedOptions[0].text;
-      showNotification(`Accent set to ${text}`, "info");
-    }
+      // Initialize dark mode if enabled
+      if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add("dark-mode");
+        document.getElementById("modeIcon").className = "fas fa-sun";
+      }
 
-    document.getElementById("accentSelect").addEventListener("change", changeAccent);
-    document.getElementById("modeToggle").addEventListener("click", () => {
-      const body = document.body;
-      const icon = document.getElementById("modeIcon");
-      body.classList.toggle("dark-mode");
-      const dark = body.classList.contains("dark-mode");
-      icon.className = dark ? "fas fa-sun" : "fas fa-moon";
-      localStorage.setItem('darkMode', dark ? 'enabled' : 'disabled');
+      // Set up mode toggle
+      document.getElementById("modeToggle").addEventListener("click", () => {
+        const body = document.body;
+        const icon = document.getElementById("modeIcon");
+        body.classList.toggle("dark-mode");
+        const dark = body.classList.contains("dark-mode");
+        icon.className = dark ? "fas fa-sun" : "fas fa-moon";
+        localStorage.setItem('darkMode', dark ? 'enabled' : 'disabled');
+      });
+
+      // Initialize speech synthesis
+      if (synth.onvoiceschanged !== undefined) {
+        synth.onvoiceschanged = () => {};
+      }
     });
 
-    if (localStorage.getItem('darkMode') === 'enabled') {
-      document.body.classList.add("dark-mode");
-      document.getElementById("modeIcon").className = "fas fa-sun";
+    function attachLoginEmail() {
+      const user = auth.currentUser;
+      const userEmail = user ? user.email : document.getElementById("userEmail").value.trim();
+      const hiddenEmailField = document.getElementById("formHiddenEmail");
+      
+      if (!userEmail) {
+        showNotification("Please login with your email before submitting the comment", "error");
+        return false;
+      }
+      hiddenEmailField.value = userEmail;
+      return true;
     }
 
-    document.getElementById("examSelect").addEventListener("change", () => {
-      const exam = document.getElementById("examSelect").value;
-      if (exam === "OET") {
-        words = [...oetWordList];
-        showNotification("OET word list loaded!", "success");
-      } else {
-        words = [];
-        document.getElementById("trainer").innerHTML = '<div class="card"><p>No words loaded. Please select an exam or add custom words.</p></div>';
-        return;
-      }
-      resetSession();
-    });
+    function showNotification(message, type = "info") {
+      const note = document.createElement("div");
+      note.className = `notification ${type}`;
+      note.innerHTML = `
+        <i class="fas fa-${
+          type === 'error' ? 'exclamation-circle' : 
+          type === 'success' ? 'check-circle' : 
+          'info-circle'
+        }"></i> 
+        <span>${message}</span>
+      `;
+      document.body.appendChild(note);
+      setTimeout(() => note.classList.add("show"), 10);
+      setTimeout(() => {
+        note.classList.remove("show");
+        setTimeout(() => note.remove(), 300);
+      }, 5000);
+    }
 
     function startPractice() {
       if (!words.length) return showNotification("Please load words first", "error");
@@ -261,19 +422,18 @@
       presentWord();
     }
 
-    function shuffle(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    }
-
     function speak(text) {
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = currentAccent;
-      u.rate = 0.9;
-      speechSynthesis.speak(u);
+      synth.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = currentAccent;
+      utterance.rate = 0.9;
+      utterance.volume = 1;
+      const voices = synth.getVoices();
+      const accentVoice = voices.find(voice => voice.lang === currentAccent) || voices[0];
+      if (accentVoice) {
+        utterance.voice = accentVoice;
+      }
+      synth.speak(utterance);
     }
 
     function presentWord() {
@@ -283,14 +443,18 @@
 
       const box = document.createElement("div");
       box.className = "word-box";
+      
       const title = document.createElement("h3");
       title.textContent = `Word ${currentWordIndex + 1} of ${words.length}`;
+      
       const input = document.createElement("input");
       input.type = "text";
       input.placeholder = "Type what you heard...";
       input.addEventListener("keypress", e => e.key === "Enter" && check());
+      
       const status = document.createElement("div");
       status.className = "status";
+      status.style.margin = "10px 0";
 
       const checkBtn = document.createElement("button");
       checkBtn.textContent = "Check";
@@ -298,35 +462,9 @@
       checkBtn.onclick = check;
 
       const speakBtn = document.createElement("button");
-      speakBtn.innerHTML = '<i class="fas fa-volume-up"></i> Speak';
+      speakBtn.innerHTML = '<i class="fas fa-volume-up"></i> Speak Again';
       speakBtn.className = "btn btn-info";
       speakBtn.onclick = () => speak(word);
-
-      function check() {
-        const typed = input.value.trim().toLowerCase();
-        const correct = word.toLowerCase();
-        previousWords.push(currentWordIndex);
-        if (typed === correct) {
-          status.textContent = "Correct!";
-          status.className = "status correct";
-          correctCount++;
-        } else {
-          status.textContent = `Incorrect. It was: ${word}`;
-          status.className = "status incorrect";
-          incorrectWords.push({ word, typed });
-        }
-        saveProgress();
-        setTimeout(() => advance(), 1500);
-      }
-
-      function advance() {
-        currentWordIndex++;
-        if (currentWordIndex < words.length) {
-          presentWord();
-        } else {
-          showScore();
-        }
-      }
 
       const flagBtn = document.createElement("button");
       flagBtn.className = flaggedWords.includes(currentWordIndex) ? "btn btn-warning" : "btn";
@@ -363,9 +501,40 @@
 
       const controls = document.createElement("div");
       controls.className = "controls";
-      controls.append(flagBtn, backBtn, nextBtn);
+      controls.style.display = "flex";
+      controls.style.gap = "10px";
+      controls.style.marginTop = "15px";
+      controls.append(backBtn, flagBtn, nextBtn);
 
-      box.append(title, speakBtn, input, checkBtn, status, controls);
+      function check() {
+        const typed = input.value.trim().toLowerCase();
+        const correct = word.toLowerCase();
+        previousWords.push(currentWordIndex);
+        
+        if (typed === correct) {
+          status.textContent = "? Correct!";
+          status.className = "status correct";
+          correctCount++;
+        } else {
+          status.textContent = `? Incorrect. The correct spelling is: ${word}`;
+          status.className = "status incorrect";
+          incorrectWords.push({ word, typed });
+        }
+        
+        saveProgress();
+        setTimeout(() => advance(), 1500);
+      }
+
+      function advance() {
+        currentWordIndex++;
+        if (currentWordIndex < words.length) {
+          presentWord();
+        } else {
+          showScore();
+        }
+      }
+
+      box.append(title, speakBtn, document.createElement("br"), input, checkBtn, status, controls);
       trainer.appendChild(box);
       setTimeout(() => speak(word), 500);
       input.focus();
@@ -374,26 +543,32 @@
     function showScore() {
       const div = document.getElementById("scoreDisplay");
       const percent = Math.round((correctCount / words.length) * 100);
-      div.innerHTML = `<div class="card"><h2>Test Complete</h2><p>You scored ${correctCount} out of ${words.length} (${percent}%)</p>` +
-      (incorrectWords.length ? `<h3>Incorrect Words</h3><ul>` +
-        incorrectWords.map(w => `<li><strong>${w.word}</strong> — You typed: <em>${w.typed}</em></li>`).join('') +
-        `</ul>` : '') +
-      (flaggedWords.length ? `<h3>Flagged Words</h3><ul>` +
-        flaggedWords.map(i => `<li>${words[i]}</li>`).join('') + `</ul>` : '') +
-      `<button onclick="location.reload()" class="btn btn-info mt-2"><i class="fas fa-redo"></i> Start New Session</button></div>`;
+      let scoreColor = "#28a745";
+      if (percent < 50) scoreColor = "#dc3545";
+      else if (percent < 75) scoreColor = "#ffc107";
+      
+      div.innerHTML = `
+        <div class="word-box">
+          <h2 style="color: ${scoreColor}">Test Complete</h2>
+          <p>You scored <strong style="color: ${scoreColor}">${correctCount}</strong> out of ${words.length} (<strong style="color: ${scoreColor}">${percent}%</strong>)</p>
+          ${incorrectWords.length ? `
+            <h3>Incorrect Words</h3>
+            <ul style="text-align: left;">
+              ${incorrectWords.map(w => `<li><strong>${w.word}</strong> ï¿½ You typed: <em>${w.typed}</em></li>`).join('')}
+            </ul>
+          ` : ''}
+          ${flaggedWords.length ? `
+            <h3>Flagged Words</h3>
+            <ul style="text-align: left;">
+              ${flaggedWords.map(i => `<li>${words[i]}</li>`).join('')}
+            </ul>
+          ` : ''}
+          <button onclick="location.reload()" class="btn btn-info mt-2">
+            <i class="fas fa-redo"></i> Start New Session
+          </button>
+        </div>
+      `;
       localStorage.removeItem(storageKey);
-    }
-
-    function showNotification(message, type = "info") {
-      const note = document.createElement("div");
-      note.className = `notification ${type}`;
-      note.innerHTML = `<i class="fas fa-${type === 'error' ? 'exclamation-circle' : type === 'success' ? 'check-circle' : 'info-circle'}"></i> <span>${message}</span>`;
-      document.body.appendChild(note);
-      setTimeout(() => note.classList.add("show"), 10);
-      setTimeout(() => {
-        note.classList.remove("show");
-        setTimeout(() => note.remove(), 300);
-      }, 3000);
     }
 
     function resetSession() {
@@ -407,85 +582,143 @@
 
     function saveProgress() {
       if (mode === "practice") {
-        localStorage.setItem(storageKey, JSON.stringify({ words, currentWordIndex, correctCount, flaggedWords, incorrectWords, previousWords }));
-      }
-    }
-
-    function loadProgress() {
-      const saved = localStorage.getItem(storageKey);
-      if (saved && mode === "practice") {
-        const prog = JSON.parse(saved);
-        Object.assign({ words, currentWordIndex, correctCount, flaggedWords, incorrectWords, previousWords }, prog);
+        localStorage.setItem(storageKey, JSON.stringify({ 
+          words, 
+          currentWordIndex, 
+          correctCount, 
+          flaggedWords, 
+          incorrectWords, 
+          previousWords 
+        }));
       }
     }
 
     function addCustomWords() {
       const input = document.getElementById("wordInput").value.trim();
       if (!input) return showNotification("Enter some words", "error");
-      words = input.split(/[\n,]+/).map(w => w.trim()).filter(Boolean);
+      
+      words = input.split(/[\n,]+/)
+        .map(w => w.trim())
+        .filter(w => w.length > 0);
+      
       document.getElementById("wordInput").value = "";
       resetSession();
-      showNotification("Custom words added!", "success");
-      presentWord();
+      showNotification(`Added ${words.length} custom words!`, "success");
+      
+      if (words.length > 0) {
+        presentWord();
+      }
     }
 
     function handleFileUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
+      
       const ext = file.name.split(".").pop().toLowerCase();
       const reader = new FileReader();
+      const loadingIndicator = document.getElementById("loadingIndicator");
+      
+      loadingIndicator.style.display = "block";
+      showNotification("Processing your file...", "info");
 
       reader.onload = async (ev) => {
         let text = "";
-        if (ext === "txt") text = ev.target.result;
-        else if (ext === "pdf") {
-          const pdf = await pdfjsLib.getDocument(new Uint8Array(ev.target.result)).promise;
-          for (let i = 1; i <= pdf.numPages; i++) {
-            const page = await pdf.getPage(i);
-            const content = await page.getTextContent();
-            text += content.items.map(item => item.str).join(" ") + "\n";
+        try {
+          if (ext === "txt") {
+            text = ev.target.result;
+          } else if (ext === "pdf") {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+            
+            const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(ev.target.result) }).promise;
+            for (let i = 1; i <= pdf.numPages; i++) {
+              const page = await pdf.getPage(i);
+              const content = await page.getTextContent();
+              text += content.items.map(item => item.str).join(" ") + "\n";
+            }
+          } else if (ext === "docx") {
+            const result = await mammoth.extractRawText({ arrayBuffer: ev.target.result });
+            text = result.value;
+          } else {
+            throw new Error("Unsupported file type");
           }
-        } else if (ext === "docx") {
-          const result = await mammoth.extractRawText({ arrayBuffer: ev.target.result });
-          text = result.value;
-        } else return showNotification("Unsupported file", "error");
-
-        words = text.split(/[\n,]+/).map(w => w.trim()).filter(Boolean);
-        resetSession();
-        showNotification(`${words.length} words loaded!`, "success");
-        presentWord();
+          
+          words = text.split(/[\n,]+/)
+            .map(w => w.trim())
+            .filter(w => w.length > 0);
+            
+          resetSession();
+          showNotification(`Successfully loaded ${words.length} words from file!`, "success");
+          
+          if (words.length > 0) {
+            presentWord();
+          }
+        } catch (error) {
+          console.error("File processing error:", error);
+          showNotification(`Error processing file: ${error.message}`, "error");
+        } finally {
+          loadingIndicator.style.display = "none";
+          e.target.value = "";
+        }
       };
 
-      if (ext === "pdf" || ext === "docx") reader.readAsArrayBuffer(file);
-      else reader.readAsText(file);
+      if (ext === "pdf" || ext === "docx") {
+        reader.readAsArrayBuffer(file);
+      } else {
+        reader.readAsText(file);
+      }
     }
 
     function saveWordList() {
-      if (!userEmail) return showNotification("Login first", "error");
-      localStorage.setItem(`spellright-list-${userEmail}`, JSON.stringify(words));
-      showNotification("Word list saved!", "success");
+      if (!userEmail) return showNotification("Please login first to save words", "error");
+      
+      showNotification("Saving words to cloud...", "info");
+      db.collection("wordLists").doc(userEmail).set({ words })
+        .then(() => showNotification("Words saved to cloud successfully!", "success"))
+        .catch(err => {
+          console.error("Save error:", err);
+          showNotification("Failed to save words: " + err.message, "error");
+        });
     }
 
     function loadWordList() {
-      if (!userEmail) return showNotification("Login first", "error");
-      const saved = localStorage.getItem(`spellright-list-${userEmail}`);
-      if (saved) {
-        words = JSON.parse(saved);
-        resetSession();
-        showNotification("Word list loaded!", "success");
-        presentWord();
-      } else {
-        showNotification("No saved list found", "error");
-      }
+      if (!userEmail) return showNotification("Please login first to load words", "error");
+      
+      showNotification("Loading words from cloud...", "info");
+      db.collection("wordLists").doc(userEmail).get()
+        .then(doc => {
+          if (doc.exists) {
+            words = doc.data().words || [];
+            resetSession();
+            showNotification(`Loaded ${words.length} words from cloud!`, "success");
+            
+            if (words.length > 0) {
+              presentWord();
+            }
+          } else {
+            showNotification("No saved word list found in cloud", "info");
+          }
+        })
+        .catch(err => {
+          console.error("Load error:", err);
+          showNotification("Error loading words: " + err.message, "error");
+        });
     }
 
     function clearWordList() {
-      if (confirm("Are you sure?")) {
+      if (confirm("Are you sure you want to clear all words?")) {
         words = [];
-        document.getElementById("trainer").innerHTML = '<div class="card"><p>Word list cleared.</p></div>';
+        document.getElementById("trainer").innerHTML = '<div class="word-box"><p>Word list cleared.</p></div>';
         document.getElementById("scoreDisplay").innerHTML = "";
-        showNotification("Word list cleared.", "success");
+        showNotification("Word list cleared", "success");
       }
+    }
+
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
     }
   </script>
 </body>
