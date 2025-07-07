@@ -272,7 +272,10 @@
 
   <!-- App Logic -->
   <script>
-    let words = [];
+    // Word lists
+    let oetWords = [];
+    let customWords = [];
+    let currentWords = [];
     let userEmail = "";
     let currentAccent = "en-GB";
     let currentWordIndex = 0;
@@ -281,6 +284,7 @@
     let incorrectWords = [];
     let previousWords = [];
     let mode = "";
+    let currentListType = ""; // 'oet' or 'custom'
     const storageKey = "spellrightpro-progress";
     const synth = window.speechSynthesis;
 
@@ -294,6 +298,26 @@
         userEmail = "";
         document.getElementById("loginStatus").textContent = "Not logged in";
         document.getElementById("loginStatus").style.color = "red";
+      }
+    });
+
+    // Load OET words when exam is selected
+    document.getElementById("examSelect").addEventListener("change", function() {
+      if (this.value === "OET") {
+        // Save current custom words if switching from custom list
+        if (currentListType === "custom" && customWords.length > 0 && userEmail) {
+          saveWordList();
+        }
+        
+        // Load OET words from external file
+        if (typeof OET_WORD_LIST !== 'undefined') {
+          oetWords = OET_WORD_LIST;
+          currentWords = [...oetWords];
+          currentListType = "oet";
+          showNotification(`Loaded ${oetWords.length} OET words`, "success");
+        } else {
+          showNotification("OET word list not available", "error");
+        }
       }
     });
 
@@ -328,7 +352,7 @@
       });
     }
 
-    // Form submission handler - Direct copy from index.html
+    // Form submission handler
     document.addEventListener('DOMContentLoaded', function() {
       const form = document.querySelector('form[data-netlify="true"]');
       
@@ -407,11 +431,12 @@
     }
 
     function startPractice() {
-      if (!words.length) return showNotification("Please load words first", "error");
+      if (!currentWords.length) return showNotification("Please load words first", "error");
       mode = "practice";
-      // Load progress if available
+      
+      // Load progress if available for current word list
       const progress = JSON.parse(localStorage.getItem(storageKey));
-      if (progress && progress.words.join() === words.join()) {
+      if (progress && progress.words.join() === currentWords.join() && progress.listType === currentListType) {
         if (confirm("Found previous progress. Do you want to resume where you left off?")) {
           currentWordIndex = progress.currentWordIndex;
           correctCount = progress.correctCount;
@@ -427,9 +452,12 @@
     }
 
     function startTest() {
-      if (!words.length) return showNotification("Please load words first", "error");
+      if (!currentWords.length) return showNotification("Please load words first", "error");
       mode = "test";
-      words = shuffle([...words]).slice(0, 24);
+      
+      // For test mode, we always use a shuffled subset
+      const testWords = shuffle([...currentWords]).slice(0, 24);
+      currentWords = testWords;
       resetSession();
       presentWord();
     }
@@ -449,7 +477,7 @@
     }
 
     function presentWord() {
-      const word = words[currentWordIndex];
+      const word = currentWords[currentWordIndex];
       const trainer = document.getElementById("trainer");
       trainer.innerHTML = "";
 
@@ -457,7 +485,7 @@
       box.className = "word-box";
       
       const title = document.createElement("h3");
-      title.textContent = `Word ${currentWordIndex + 1} of ${words.length}`;
+      title.textContent = `Word ${currentWordIndex + 1} of ${currentWords.length}`;
       
       const input = document.createElement("input");
       input.type = "text";
@@ -507,7 +535,7 @@
       nextBtn.onclick = () => {
         previousWords.push(currentWordIndex);
         currentWordIndex++;
-        if (currentWordIndex < words.length) presentWord();
+        if (currentWordIndex < currentWords.length) presentWord();
         else showScore();
       };
 
@@ -539,7 +567,7 @@
 
       function advance() {
         currentWordIndex++;
-        if (currentWordIndex < words.length) {
+        if (currentWordIndex < currentWords.length) {
           presentWord();
         } else {
           showScore();
@@ -554,7 +582,7 @@
 
     function showScore() {
       const div = document.getElementById("scoreDisplay");
-      const percent = Math.round((correctCount / words.length) * 100);
+      const percent = Math.round((correctCount / currentWords.length) * 100);
       let scoreColor = "#28a745";
       if (percent < 50) scoreColor = "#dc3545";
       else if (percent < 75) scoreColor = "#ffc107";
@@ -562,7 +590,7 @@
       div.innerHTML = `
         <div class="word-box">
           <h2 style="color: ${scoreColor}">Test Complete</h2>
-          <p>You scored <strong style="color: ${scoreColor}">${correctCount}</strong> out of ${words.length} (<strong style="color: ${scoreColor}">${percent}%</strong>)</p>
+          <p>You scored <strong style="color: ${scoreColor}">${correctCount}</strong> out of ${currentWords.length} (<strong style="color: ${scoreColor}">${percent}%</strong>)</p>
           ${incorrectWords.length ? `
             <h3>Incorrect Words</h3>
             <ul style="text-align: left;">
@@ -572,7 +600,7 @@
           ${flaggedWords.length ? `
             <h3>Flagged Words</h3>
             <ul style="text-align: left;">
-              ${flaggedWords.map(i => `<li>${words[i]}</li>`).join('')}
+              ${flaggedWords.map(i => `<li>${currentWords[i]}</li>`).join('')}
             </ul>
           ` : ''}
           <button onclick="location.reload()" class="btn btn-info mt-2">
@@ -595,7 +623,8 @@
     function saveProgress() {
       if (mode === "practice") {
         localStorage.setItem(storageKey, JSON.stringify({ 
-          words, 
+          words: currentWords,
+          listType: currentListType,
           currentWordIndex, 
           correctCount, 
           flaggedWords, 
@@ -609,15 +638,23 @@
       const input = document.getElementById("wordInput").value.trim();
       if (!input) return showNotification("Enter some words", "error");
       
-      words = input.split(/[\n,]+/)
+      // Switch to custom words mode
+      currentListType = "custom";
+      customWords = input.split(/[\n,]+/)
         .map(w => w.trim())
         .filter(w => w.length > 0);
       
+      currentWords = [...customWords];
       document.getElementById("wordInput").value = "";
       resetSession();
-      showNotification(`Added ${words.length} custom words!`, "success");
+      showNotification(`Added ${customWords.length} custom words!`, "success");
       
-      if (words.length > 0) {
+      // Auto-save custom words if logged in
+      if (userEmail) {
+        saveWordList();
+      }
+      
+      if (currentWords.length > 0) {
         presentWord();
       }
     }
@@ -654,14 +691,22 @@
             throw new Error("Unsupported file type");
           }
           
-          words = text.split(/[\n,]+/)
+          // Switch to custom words mode
+          currentListType = "custom";
+          customWords = text.split(/[\n,]+/)
             .map(w => w.trim())
             .filter(w => w.length > 0);
-            
-          resetSession();
-          showNotification(`Successfully loaded ${words.length} words from file!`, "success");
           
-          if (words.length > 0) {
+          currentWords = [...customWords];
+          resetSession();
+          showNotification(`Successfully loaded ${customWords.length} words from file!`, "success");
+          
+          // Auto-save custom words if logged in
+          if (userEmail) {
+            saveWordList();
+          }
+          
+          if (currentWords.length > 0) {
             presentWord();
           }
         } catch (error) {
@@ -684,7 +729,10 @@
       if (!userEmail) return showNotification("Please login first to save words", "error");
       
       showNotification("Saving words to cloud...", "info");
-      db.collection("wordLists").doc(userEmail).set({ words })
+      db.collection("wordLists").doc(userEmail).set({ 
+        customWords,
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp() 
+      })
         .then(() => showNotification("Words saved to cloud successfully!", "success"))
         .catch(err => {
           console.error("Save error:", err);
@@ -699,11 +747,13 @@
       db.collection("wordLists").doc(userEmail).get()
         .then(doc => {
           if (doc.exists) {
-            words = doc.data().words || [];
-            showNotification(`Loaded ${words.length} words from cloud!`, "success");
+            customWords = doc.data().customWords || [];
+            currentListType = "custom";
+            currentWords = [...customWords];
+            showNotification(`Loaded ${customWords.length} custom words from cloud!`, "success");
             // Check for existing progress
             const progress = JSON.parse(localStorage.getItem(storageKey));
-            if (progress && progress.words.join() === words.join()) {
+            if (progress && progress.words.join() === currentWords.join() && progress.listType === currentListType) {
               if (confirm("Found previous progress. Do you want to resume where you left off?")) {
                 currentWordIndex = progress.currentWordIndex;
                 correctCount = progress.correctCount;
@@ -726,7 +776,8 @@
 
     function clearWordList() {
       if (confirm("Are you sure you want to clear all words?")) {
-        words = [];
+        currentWords = [];
+        customWords = [];
         document.getElementById("trainer").innerHTML = '<div class="word-box"><p>Word list cleared.</p></div>';
         document.getElementById("scoreDisplay").innerHTML = "";
         showNotification("Word list cleared", "success");
