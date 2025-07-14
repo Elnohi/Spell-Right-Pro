@@ -25,6 +25,11 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
+
+    if (location.hostname === 'localhost' || location.hostname.includes('spellrightpro')) {
+    localStorage.setItem('debug_mode', 'true');
+    console.log("✅ Firebase DebugView mode enabled.");
+  }
   </script>
 
   <!-- FontAwesome -->
