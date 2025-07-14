@@ -14,24 +14,39 @@
   <!-- Firebase Config -->
   <script>
   const firebaseConfig = {
-  apiKey: "AIzaSyCZ-rAPnRgVjSRFOFvbiQlowE6A3RVvwWo",
-  authDomain: "spellrightpro-firebase.firebaseapp.com",
-  projectId: "spellrightpro-firebase",
-  storageBucket: "spellrightpro-firebase.firebasestorage.app",
-  messagingSenderId: "798456641137",
-  appId: "1:798456641137:web:5c6d79db5bf49d04928dd0",
-  measurementId: "G-H09MF13297"
-};
+    apiKey: "AIzaSyCZ-rAPnRgVjSRFOFvbiQlowE6A3RVvwWo",
+    authDomain: "spellrightpro-firebase.firebaseapp.com",
+    projectId: "spellrightpro-firebase",
+    storageBucket: "spellrightpro-firebase.firebasestorage.app",
+    messagingSenderId: "798456641137",
+    appId: "1:798456641137:web:5c6d79db5bf49d04928dd0",
+    measurementId: "G-H09MF13297"
+  };
     
-    firebase.initializeApp(firebaseConfig);
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
     const analytics = firebase.analytics();
 
+    // Log initial page view
+    analytics.logEvent('page_view', {
+      page_title: document.title,
+      page_location: window.location.href,
+      page_path: window.location.pathname
+    });
+
+    // Debug mode setup
     if (location.hostname === 'localhost' || location.hostname.includes('spellrightpro')) {
-    localStorage.setItem('debug_mode', 'true');
-    console.log("✅ Firebase DebugView mode enabled.");
-  }
+      localStorage.setItem('debug_mode', 'true');
+      console.log("✅ Firebase DebugView mode enabled.");
+      analytics.setAnalyticsCollectionEnabled(true);
+      
+      // For testing - log all events to console
+      analytics.onLogEvent((event) => {
+        console.log('Analytics Event:', event);
+      });
+    }
   </script>
 
   <!-- FontAwesome -->
@@ -287,21 +302,37 @@
     const storageKey = "spellrightpro-progress";
     const synth = window.speechSynthesis;
 
-    // Initialize auth state listener
+    // Initialize auth state listener with analytics
     auth.onAuthStateChanged(user => {
       if (user) {
         userEmail = user.email;
+        // Set user ID for analytics
+        analytics.setUserId(user.uid);
+        // Track screen view
+        analytics.logEvent('screen_view', {
+          screen_name: 'Main',
+          screen_class: 'Home'
+        });
+        // Track login success
+        analytics.logEvent('login_success');
+        
         document.getElementById("loginStatus").textContent = `Logged in as ${userEmail}`;
         document.getElementById("loginStatus").style.color = "green";
       } else {
+        // Remove user ID when logged out
+        analytics.setUserId(null);
         userEmail = "";
         document.getElementById("loginStatus").textContent = "Not logged in";
         document.getElementById("loginStatus").style.color = "red";
       }
     });
 
-    // Load OET words when exam is selected
+    // Track exam selection changes
     document.getElementById("examSelect").addEventListener("change", function() {
+      analytics.logEvent('exam_selected', {
+        exam_type: this.value
+      });
+      
       if (this.value === "OET") {
         // Save current custom words if switching from custom list
         if (currentListType === "custom" && customWords.length > 0 && userEmail) {
@@ -314,44 +345,100 @@
           currentWords = [...oetWords];
           currentListType = "oet";
           showNotification(`Loaded ${oetWords.length} OET words`, "success");
+          
+          // Track word list loaded
+          analytics.logEvent('word_list_loaded', {
+            list_type: 'OET',
+            word_count: oetWords.length
+          });
         } else {
           showNotification("OET word list not available", "error");
+          analytics.logEvent('word_list_error', {
+            error: 'OET word list not available'
+          });
         }
       }
+    });
+
+    // Track accent changes
+    document.getElementById("accentSelect").addEventListener("change", function() {
+      currentAccent = this.value;
+      analytics.logEvent('accent_changed', {
+        accent: currentAccent
+      });
     });
 
     function loginUser() {
       const email = document.getElementById("userEmail").value.trim();
       const password = document.getElementById("userPassword").value;
-      if (!email || !password) return showNotification("Email and password required", "error");
+      if (!email || !password) {
+        analytics.logEvent('login_attempt', {
+          status: 'failed',
+          reason: 'missing_credentials'
+        });
+        return showNotification("Email and password required", "error");
+      }
 
       showNotification("Logging in...", "info");
+      analytics.logEvent('login_attempt', {
+        status: 'started'
+      });
+      
       auth.signInWithEmailAndPassword(email, password)
-        .then(() => showNotification("Login successful!", "success"))
-        .catch(error => showNotification(error.message, "error"));
+        .then(() => {
+          showNotification("Login successful!", "success");
+          analytics.logEvent('login_success');
+        })
+        .catch(error => {
+          showNotification(error.message, "error");
+          analytics.logEvent('login_failed', {
+            error: error.message
+          });
+        });
     }
 
     function signUpUser() {
       const email = document.getElementById("userEmail").value.trim();
       const password = document.getElementById("userPassword").value;
-      if (!email || !password) return showNotification("Email and password required", "error");
+      if (!email || !password) {
+        analytics.logEvent('signup_attempt', {
+          status: 'failed',
+          reason: 'missing_credentials'
+        });
+        return showNotification("Email and password required", "error");
+      }
 
       showNotification("Creating account...", "info");
+      analytics.logEvent('signup_attempt', {
+        status: 'started'
+      });
+      
       auth.createUserWithEmailAndPassword(email, password)
-        .then(() => showNotification("Account created and signed in!", "success"))
-        .catch(error => showNotification(error.message, "error"));
+        .then(() => {
+          showNotification("Account created and signed in!", "success");
+          analytics.logEvent('signup_success');
+        })
+        .catch(error => {
+          showNotification(error.message, "error");
+          analytics.logEvent('signup_failed', {
+            error: error.message
+          });
+        });
     }
 
     function logoutUser() {
       showNotification("Logging out...", "info");
+      analytics.logEvent('logout_attempt');
+      
       auth.signOut().then(() => {
         showNotification("You have logged out", "info");
         document.getElementById("trainer").innerHTML = "";
         document.getElementById("scoreDisplay").innerHTML = "";
+        analytics.logEvent('logout_success');
       });
     }
 
-    // Form submission handler
+    // Form submission handler with analytics
     document.addEventListener('DOMContentLoaded', function() {
       const form = document.querySelector('form[data-netlify="true"]');
       
@@ -360,6 +447,10 @@
           if (!attachLoginEmail()) {
             event.preventDefault();
             showNotification("Please login before submitting comments", "error");
+            analytics.logEvent('feedback_attempt', {
+              status: 'failed',
+              reason: 'not_logged_in'
+            });
             return false;
           }
 
@@ -367,6 +458,11 @@
           const originalBtnText = submitBtn.innerHTML;
           submitBtn.disabled = true;
           submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+          // Track feedback submission
+          analytics.logEvent('feedback_submitted', {
+            form_name: 'feedback'
+          });
 
           setTimeout(() => {
             submitBtn.disabled = false;
@@ -381,7 +477,7 @@
         document.getElementById("modeIcon").className = "fas fa-sun";
       }
 
-      // Set up mode toggle
+      // Set up mode toggle with analytics
       document.getElementById("modeToggle").addEventListener("click", () => {
         const body = document.body;
         const icon = document.getElementById("modeIcon");
@@ -389,6 +485,11 @@
         const dark = body.classList.contains("dark-mode");
         icon.className = dark ? "fas fa-sun" : "fas fa-moon";
         localStorage.setItem('darkMode', dark ? 'enabled' : 'disabled');
+        
+        // Track theme change
+        analytics.logEvent('theme_changed', {
+          theme: dark ? 'dark' : 'light'
+        });
       });
 
       // Initialize speech synthesis
@@ -427,40 +528,77 @@
         note.classList.remove("show");
         setTimeout(() => note.remove(), 300);
       }, 5000);
+      
+      // Track notification shown
+      analytics.logEvent('notification_shown', {
+        type: type,
+        message: message
+      });
     }
 
     function startPractice() {
-  if (currentListType === "oet") {
-    currentWords = [...oetWords]; // Use full OET list
-  }
-  if (!currentWords.length) return showNotification("Please load words first", "error");
-  mode = "practice";
-  
-  const progress = JSON.parse(localStorage.getItem(storageKey));
-  if (progress && progress.words.join() === currentWords.join() && progress.listType === currentListType) {
-    if (confirm("Found previous progress. Do you want to resume where you left off?")) {
-      currentWordIndex = progress.currentWordIndex;
-      correctCount = progress.correctCount;
-      flaggedWords = progress.flaggedWords;
-      incorrectWords = progress.incorrectWords;
-      previousWords = progress.previousWords;
+      if (currentListType === "oet") {
+        currentWords = [...oetWords]; // Use full OET list
+      }
+      if (!currentWords.length) {
+        analytics.logEvent('practice_attempt', {
+          status: 'failed',
+          reason: 'no_words_loaded'
+        });
+        return showNotification("Please load words first", "error");
+      }
+      mode = "practice";
+      
+      // Track practice start
+      analytics.logEvent('practice_start', {
+        word_count: currentWords.length,
+        list_type: currentListType
+      });
+      
+      const progress = JSON.parse(localStorage.getItem(storageKey));
+      if (progress && progress.words.join() === currentWords.join() && progress.listType === currentListType) {
+        if (confirm("Found previous progress. Do you want to resume where you left off?")) {
+          currentWordIndex = progress.currentWordIndex;
+          correctCount = progress.correctCount;
+          flaggedWords = progress.flaggedWords;
+          incorrectWords = progress.incorrectWords;
+          previousWords = progress.previousWords;
+          presentWord();
+          
+          // Track practice resumed
+          analytics.logEvent('practice_resumed', {
+            progress_index: currentWordIndex,
+            correct_count: correctCount
+          });
+          return;
+        }
+      }
+      resetSession();
       presentWord();
-      return;
     }
-  }
-  resetSession();
-  presentWord();
-}
 
-function startTest() {
-  if (currentListType === "oet") {
-    currentWords = shuffle([...oetWords]).slice(0, 24); // Use 24 random OET words
-  }
-  if (!currentWords.length) return showNotification("Please load words first", "error");
-  mode = "test";
-  resetSession();
-  presentWord();
-}
+    function startTest() {
+      if (currentListType === "oet") {
+        currentWords = shuffle([...oetWords]).slice(0, 24); // Use 24 random OET words
+      }
+      if (!currentWords.length) {
+        analytics.logEvent('test_attempt', {
+          status: 'failed',
+          reason: 'no_words_loaded'
+        });
+        return showNotification("Please load words first", "error");
+      }
+      mode = "test";
+      
+      // Track test start
+      analytics.logEvent('test_start', {
+        word_count: currentWords.length,
+        list_type: currentListType
+      });
+      
+      resetSession();
+      presentWord();
+    }
 
     function speak(text) {
       synth.cancel();
@@ -474,6 +612,15 @@ function startTest() {
         utterance.voice = accentVoice;
       }
       synth.speak(utterance);
+      
+      // Track word spoken
+      if (mode) {
+        analytics.logEvent('word_spoken', {
+          mode: mode,
+          word: text,
+          accent: currentAccent
+        });
+      }
     }
 
     function presentWord() {
@@ -513,8 +660,19 @@ function startTest() {
         : '<i class="far fa-flag"></i> Flag';
       flagBtn.onclick = () => {
         const i = flaggedWords.indexOf(currentWordIndex);
-        if (i === -1) flaggedWords.push(currentWordIndex);
-        else flaggedWords.splice(i, 1);
+        if (i === -1) {
+          flaggedWords.push(currentWordIndex);
+          analytics.logEvent('word_flagged', {
+            word: word,
+            position: currentWordIndex
+          });
+        } else {
+          flaggedWords.splice(i, 1);
+          analytics.logEvent('word_unflagged', {
+            word: word,
+            position: currentWordIndex
+          });
+        }
         presentWord();
       };
 
@@ -526,6 +684,10 @@ function startTest() {
         if (previousWords.length > 0) {
           currentWordIndex = previousWords.pop();
           presentWord();
+          analytics.logEvent('navigation', {
+            direction: 'back',
+            current_word: currentWords[currentWordIndex]
+          });
         }
       };
 
@@ -535,7 +697,13 @@ function startTest() {
       nextBtn.onclick = () => {
         previousWords.push(currentWordIndex);
         currentWordIndex++;
-        if (currentWordIndex < currentWords.length) presentWord();
+        if (currentWordIndex < currentWords.length) {
+          presentWord();
+          analytics.logEvent('navigation', {
+            direction: 'next',
+            current_word: currentWords[currentWordIndex]
+          });
+        }
         else showScore();
       };
 
@@ -555,10 +723,25 @@ function startTest() {
           status.textContent = "✓ Correct!";
           status.className = "status correct";
           correctCount++;
+          
+          // Track correct answer
+          analytics.logEvent('word_answered', {
+            status: 'correct',
+            word: word,
+            mode: mode
+          });
         } else {
           status.textContent = `✗ Incorrect. The correct spelling is: ${word}`;
           status.className = "status incorrect";
           incorrectWords.push({ word, typed });
+          
+          // Track incorrect answer
+          analytics.logEvent('word_answered', {
+            status: 'incorrect',
+            word: word,
+            typed: typed,
+            mode: mode
+          });
         }
         
         saveProgress();
@@ -608,6 +791,17 @@ function startTest() {
           </button>
         </div>
       `;
+      
+      // Track session completion
+      analytics.logEvent('session_completed', {
+        mode: mode,
+        word_count: currentWords.length,
+        correct_count: correctCount,
+        incorrect_count: incorrectWords.length,
+        flagged_count: flaggedWords.length,
+        percentage: percent
+      });
+      
       localStorage.removeItem(storageKey);
     }
 
@@ -636,7 +830,13 @@ function startTest() {
 
     function addCustomWords() {
       const input = document.getElementById("wordInput").value.trim();
-      if (!input) return showNotification("Enter some words", "error");
+      if (!input) {
+        analytics.logEvent('custom_words_attempt', {
+          status: 'failed',
+          reason: 'no_input'
+        });
+        return showNotification("Enter some words", "error");
+      }
       
       // Switch to custom words mode
       currentListType = "custom";
@@ -648,6 +848,11 @@ function startTest() {
       document.getElementById("wordInput").value = "";
       resetSession();
       showNotification(`Added ${customWords.length} custom words!`, "success");
+      
+      // Track custom words added
+      analytics.logEvent('custom_words_added', {
+        word_count: customWords.length
+      });
       
       // Auto-save custom words if logged in
       if (userEmail) {
@@ -669,6 +874,13 @@ function startTest() {
       
       loadingIndicator.style.display = "block";
       showNotification("Processing your file...", "info");
+      
+      // Track file upload started
+      analytics.logEvent('file_upload_started', {
+        file_type: ext,
+        file_name: file.name,
+        file_size: file.size
+      });
 
       reader.onload = async (ev) => {
         let text = "";
@@ -701,6 +913,12 @@ function startTest() {
           resetSession();
           showNotification(`Successfully loaded ${customWords.length} words from file!`, "success");
           
+          // Track successful file upload
+          analytics.logEvent('file_upload_success', {
+            file_type: ext,
+            word_count: customWords.length
+          });
+          
           // Auto-save custom words if logged in
           if (userEmail) {
             saveWordList();
@@ -712,6 +930,12 @@ function startTest() {
         } catch (error) {
           console.error("File processing error:", error);
           showNotification(`Error processing file: ${error.message}`, "error");
+          
+          // Track file upload error
+          analytics.logEvent('file_upload_error', {
+            file_type: ext,
+            error: error.message
+          });
         } finally {
           loadingIndicator.style.display = "none";
           e.target.value = "";
@@ -726,24 +950,53 @@ function startTest() {
     }
 
     function saveWordList() {
-      if (!userEmail) return showNotification("Please login first to save words", "error");
+      if (!userEmail) {
+        analytics.logEvent('word_save_attempt', {
+          status: 'failed',
+          reason: 'not_logged_in'
+        });
+        return showNotification("Please login first to save words", "error");
+      }
       
       showNotification("Saving words to cloud...", "info");
+      analytics.logEvent('word_save_attempt', {
+        status: 'started',
+        word_count: customWords.length
+      });
+      
       db.collection("wordLists").doc(userEmail).set({ 
         customWords,
         lastUpdated: firebase.firestore.FieldValue.serverTimestamp() 
       })
-        .then(() => showNotification("Words saved to cloud successfully!", "success"))
+        .then(() => {
+          showNotification("Words saved to cloud successfully!", "success");
+          analytics.logEvent('word_save_success', {
+            word_count: customWords.length
+          });
+        })
         .catch(err => {
           console.error("Save error:", err);
           showNotification("Failed to save words: " + err.message, "error");
+          analytics.logEvent('word_save_error', {
+            error: err.message
+          });
         });
     }
 
     function loadWordList() {
-      if (!userEmail) return showNotification("Please login first to load words", "error");
+      if (!userEmail) {
+        analytics.logEvent('word_load_attempt', {
+          status: 'failed',
+          reason: 'not_logged_in'
+        });
+        return showNotification("Please login first to load words", "error");
+      }
       
       showNotification("Loading words from cloud...", "info");
+      analytics.logEvent('word_load_attempt', {
+        status: 'started'
+      });
+      
       db.collection("wordLists").doc(userEmail).get()
         .then(doc => {
           if (doc.exists) {
@@ -751,6 +1004,12 @@ function startTest() {
             currentListType = "custom";
             currentWords = [...customWords];
             showNotification(`Loaded ${customWords.length} custom words from cloud!`, "success");
+            
+            // Track successful word load
+            analytics.logEvent('word_load_success', {
+              word_count: customWords.length
+            });
+            
             // Check for existing progress
             const progress = JSON.parse(localStorage.getItem(storageKey));
             if (progress && progress.words.join() === currentWords.join() && progress.listType === currentListType) {
@@ -762,15 +1021,25 @@ function startTest() {
                 previousWords = progress.previousWords;
                 mode = "practice";
                 presentWord();
+                
+                // Track progress resumed
+                analytics.logEvent('progress_resumed', {
+                  word_count: currentWords.length,
+                  progress_index: currentWordIndex
+                });
               }
             }
           } else {
             showNotification("No saved word list found in cloud", "info");
+            analytics.logEvent('word_load_empty');
           }
         })
         .catch(err => {
           console.error("Load error:", err);
           showNotification("Error loading words: " + err.message, "error");
+          analytics.logEvent('word_load_error', {
+            error: err.message
+          });
         });
     }
 
@@ -781,6 +1050,11 @@ function startTest() {
         document.getElementById("trainer").innerHTML = '<div class="word-box"><p>Word list cleared.</p></div>';
         document.getElementById("scoreDisplay").innerHTML = "";
         showNotification("Word list cleared", "success");
+        
+        // Track word list cleared
+        analytics.logEvent('word_list_cleared');
+      } else {
+        analytics.logEvent('word_list_clear_cancelled');
       }
     }
 
@@ -791,6 +1065,17 @@ function startTest() {
       }
       return arr;
     }
+
+    // Error tracking
+    window.onerror = function(message, source, lineno, colno, error) {
+      analytics.logEvent('error_occurred', {
+        error_message: message,
+        source_file: source,
+        line_number: lineno,
+        column_number: colno,
+        error_stack: error?.stack
+      });
+    };
   </script>
 </body>
 </html>
